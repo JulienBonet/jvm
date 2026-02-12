@@ -1,0 +1,42 @@
+.releaseItemMobile{
+    margin: 10px;  
+}
+
+.releaseItemMobileInfoArea{
+    margin: 12px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.releaseItemMobileInfo{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.releaseItemMobileInfoBtnArea{
+    display: flex;
+    align-items: center;
+    
+}
+
+.releaseItemM_artist{
+
+}
+
+.releaseItemM_title{
+    font-weight: bold;
+    font-size: large;
+}
+
+.releaseItemM_label{
+    font-style: italic;
+    color:dimgrey
+}
+
+.releaseItemM_separator {
+  margin-top: 8px;
+  border-bottom: 2px dotted dimgrey;
+  width: 100%;
+}

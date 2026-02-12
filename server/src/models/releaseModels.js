@@ -1,0 +1,119 @@
+import { db } from '../../db/connection.js';
+
+export const findAllReleases = async () => {
+  const [rows] = await db.query(`
+    SELECT 
+        r.id,
+        r.title,
+        GROUP_CONCAT(DISTINCT a.name SEPARATOR ', ') AS artists,
+        GROUP_CONCAT(DISTINCT l.name SEPARATOR ', ') AS labels,
+        MAX(i.url) AS image_url,
+        d.size AS disc_size,
+        d.speed AS disc_speed
+    FROM releases r
+    LEFT JOIN release_artist ra ON ra.release_id = r.id
+    LEFT JOIN artist a ON a.id = ra.artist_id
+    LEFT JOIN release_label rl ON rl.release_id = r.id
+    LEFT JOIN label l ON l.id = rl.label_id
+    LEFT JOIN image i 
+        ON i.entity_type = 'release' 
+        AND i.entity_id = r.id
+        AND i.type = 'cover'
+    LEFT JOIN disc d 
+        ON d.release_id = r.id
+        AND d.disc_number = 1
+    GROUP BY r.id, r.title, d.size, d.speed
+    ORDER BY r.title;
+  `);
+
+  return rows;
+};
+
+export const findReleaseById = async (releaseId) => {
+  // Infos de base
+  const [release] = await db.query('SELECT * FROM releases WHERE id = ?', [releaseId]);
+
+  if (!release.length) return null;
+
+  const releaseData = release[0];
+
+  // cover
+  const [cover] = await db.query(
+    `
+    SELECT i.id, i.url AS image_url
+    FROM image i
+    WHERE entity_type = "release"
+    AND entity_id = ?;
+    `,
+    [releaseId],
+  );
+
+  // Artistes
+  const [artists] = await db.query(
+    `
+    SELECT a.id, a.name, ra.role
+    FROM release_artist ra
+    JOIN artist a ON a.id = ra.artist_id
+    WHERE ra.release_id = ?`,
+    [releaseId],
+  );
+
+  // Labels
+  const [labels] = await db.query(
+    `
+    SELECT l.id, l.name, rl.catalog_number
+    FROM release_label rl
+    JOIN label l ON l.id = rl.label_id
+    WHERE rl.release_id = ?`,
+    [releaseId],
+  );
+
+  // Genres
+  const [genres] = await db.query(
+    `
+    SELECT g.id, g.name
+    FROM release_genre rg
+    JOIN genre g ON g.id = rg.genre_id
+    WHERE rg.release_id = ?`,
+    [releaseId],
+  );
+
+  // Styles
+  const [styles] = await db.query(
+    `
+    SELECT s.id, s.name
+    FROM release_style rs
+    JOIN style s ON s.id = rs.style_id
+    WHERE rs.release_id = ?`,
+    [releaseId],
+  );
+
+  // Disques, faces, tracks
+  const [tracks] = await db.query(
+    `
+    SELECT
+        d.disc_number,
+        d.size,
+        d.speed,
+        si.name AS side,
+        t.position,
+        t.title,
+        t.duration
+    FROM disc d
+    JOIN side si ON si.disc_id = d.id
+    JOIN track t ON t.side_id = si.id
+    WHERE d.release_id = ?
+    ORDER BY d.disc_number, si.name, t.position`,
+    [releaseId],
+  );
+
+  return {
+    ...releaseData,
+    cover,
+    artists,
+    labels,
+    genres,
+    styles,
+    tracks,
+  };
+};

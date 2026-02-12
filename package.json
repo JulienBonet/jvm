@@ -1,0 +1,26 @@
+{
+  "name": "jvm_project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix server\"",
+    "lint": "eslint .",
+    "lint:client": "eslint client",
+    "lint:server": "eslint server"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "prettier": "^3.8.1"
+  },
+  "dependencies": {
+    "react-router-dom": "^7.13.0"
+  }
+}
