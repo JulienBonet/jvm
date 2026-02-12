@@ -241,7 +241,7 @@ function HomeMobile() {
 
       <div style={{ borderTop: '1px dashed #ccc' }} />
 
-      <section className="releases_list_mobile_section">
+      <section className="releases_list_section_mobile">
         {search
           ? filteredReleases.map((r) => (
               <ReleaseItemMobile
