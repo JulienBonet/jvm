@@ -1,4 +1,4 @@
-.search_filter_section_artists{
+.search_filter_section_labels{
 display: flex;
 justify-content: center;
 align-items: center;
@@ -8,7 +8,7 @@ padding: 10px;
 border-bottom: 1px solid black;
 }
 
-.artists_list_section{
+.labels_list_section{
    display: flex;
    flex-wrap: wrap;
    justify-content: center;

@@ -130,7 +130,7 @@ function HomeDesktop() {
   ======================= */
   const handleOpenModal = (release) => {
     console.log('Release clicked:', release);
-    // ici tu ouvriras ta modal
+    // code Modal ici
   };
 
   /* =======================

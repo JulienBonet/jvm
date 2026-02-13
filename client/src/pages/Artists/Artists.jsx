@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useMemo } from 'react';
-import { TextField, Select, MenuItem, Button, InputLabel, FormControl } from '@mui/material';
+import { TextField } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -77,7 +77,7 @@ function Artists() {
           }}
         />
       </section>
-      <section className="artist_list_section">
+      <section className="artists_list_section">
         {filteredArtists.map((artist) => (
           <Link
             key={artist.id}
