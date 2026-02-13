@@ -1,8 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
+import { TextField, Select, MenuItem, Button, InputLabel, FormControl } from '@mui/material';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import ClearIcon from '@mui/icons-material/Clear';
 import { Link } from 'react-router-dom';
+import ItemCard from '../../components/ItemCard/ItemCard';
+import './artist.css';
 
 function Artists() {
   const [artists, setArtists] = useState([]);
+  // states search
+  const [searchTerm, setSearchTerm] = useState('');
+  const searchRef = useRef(null);
+
   console.info('artists', artists);
 
   const backendUrl = `${import.meta.env.VITE_BACKEND_URL}`;
@@ -26,38 +36,58 @@ function Artists() {
   }, []);
 
   /* =======================
+     SEARCH
+  ======================= */
+
+  const filteredArtists = useMemo(() => {
+    return artists.filter((artist) =>
+      artist.name?.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  }, [artists, searchTerm]);
+
+  /* =======================
      RENDER
   ======================= */
 
   return (
-    <div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
-        {artists.map((artist) => (
+    <div className="artists_page">
+      <section className="search_filter_section_artists sticky-section">
+        {/* SEARCH */}
+        <TextField
+          label="Search artist"
+          variant="outlined"
+          size="small"
+          value={searchTerm}
+          inputRef={searchRef}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            endAdornment: searchTerm && (
+              <InputAdornment position="end">
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    setSearchTerm('');
+                    searchRef.current?.focus();
+                  }}
+                >
+                  <ClearIcon fontSize="small" />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+      </section>
+      <section className="artist_list_section">
+        {filteredArtists.map((artist) => (
           <Link
             key={artist.id}
             to={`/artist/${artist.id}`}
             style={{ textDecoration: 'none', color: 'inherit' }}
           >
-            <div
-              style={{
-                border: '1px solid #ccc',
-                padding: '10px',
-                width: '200px',
-              }}
-            >
-              {artist.image_url && (
-                <img
-                  src={`${backendUrl}/images/${artist.image_url}`}
-                  alt={artist.name}
-                  style={{ width: '100%', height: 'auto' }}
-                />
-              )}
-              <h3 style={{ fontWeight: 'bold' }}>{artist.name}</h3>
-              <p>{artist.id || 'N/A'}</p>
-            </div>
+            <ItemCard key={artist.id} item={artist} imageBaseUrl={`${backendUrl}/images`} />
           </Link>
         ))}
-      </div>
+      </section>
     </div>
   );
 }
