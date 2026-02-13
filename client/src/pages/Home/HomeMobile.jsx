@@ -10,9 +10,16 @@ import {
   TextField,
   InputAdornment,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Typography,
+  CircularProgress,
+  Divider,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
+import CloseIcon from '@mui/icons-material/Close';
 import { useFormat } from '../../context/FormatContext';
 import ReleaseItemMobile from '../../components/ReleaseItemMobile/ReleaseItemMobile';
 import GroupHeader from '../../components/GroupHeader/GroupHeader';
@@ -23,6 +30,11 @@ function HomeMobile() {
   const [groupBy, setGroupBy] = useState('title');
   const [search, setSearch] = useState('');
   const [openGroup, setOpenGroup] = useState(null);
+  // states modal
+  const [selectedReleaseId, setSelectedReleaseId] = useState(null);
+  const [releaseDetail, setReleaseDetail] = useState(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
   const backendUrl = `${import.meta.env.VITE_BACKEND_URL}`;
 
@@ -187,7 +199,7 @@ function HomeMobile() {
   const sortedLetters = groupedReleases ? Object.keys(groupedReleases).sort() : [];
 
   /* =======================
-     HANDLERS
+     HANDLERS LETTER GROUP
   ======================= */
 
   const toggleGroup = (letter) => {
@@ -197,6 +209,31 @@ function HomeMobile() {
   useEffect(() => {
     setOpenGroup(null);
   }, [groupBy]);
+
+  /* =======================
+     HANDLERS MODAL
+  ======================= */
+  const handleOpenInfo = async (release) => {
+    setSelectedReleaseId(release.id);
+    setOpenModal(true);
+    setLoadingDetail(true);
+
+    try {
+      const res = await fetch(`${backendUrl}/api/release/${release.id}`);
+      const data = await res.json();
+      setReleaseDetail(data);
+    } catch (err) {
+      console.error('Erreur fetch release detail:', err);
+    } finally {
+      setLoadingDetail(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setReleaseDetail(null);
+    setSelectedReleaseId(null);
+  };
 
   /* =======================
      RENDER
@@ -241,14 +278,11 @@ function HomeMobile() {
 
       <div style={{ borderTop: '1px dashed #ccc' }} />
 
+      {/* RELEASES SECTION */}
       <section className="releases_list_section_mobile">
         {search
           ? filteredReleases.map((r) => (
-              <ReleaseItemMobile
-                key={r.id}
-                release={r}
-                // onInfoClick={(release) => handleOpenInfo(release)}
-              />
+              <ReleaseItemMobile key={r.id} release={r} onInfoClick={handleOpenInfo} />
             ))
           : sortedLetters.map((letter) => (
               <div key={letter}>
@@ -260,15 +294,126 @@ function HomeMobile() {
 
                 {openGroup === letter &&
                   groupedReleases[letter].map((r) => (
-                    <ReleaseItemMobile
-                      key={r.id}
-                      release={r}
-                      // onInfoClick={(release) => handleOpenInfo(release)}
-                    />
+                    <ReleaseItemMobile key={r.id} release={r} onInfoClick={handleOpenInfo} />
                   ))}
               </div>
             ))}
       </section>
+      {/* END RELEASES SECTION */}
+
+      {/* MODAL */}
+      <Dialog open={openModal} onClose={handleCloseModal} fullWidth maxWidth="md">
+        <DialogTitle>
+          {releaseDetail?.title}
+          <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', right: 8, top: 8 }}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent dividers>
+          {loadingDetail && <CircularProgress />}
+
+          {!loadingDetail && releaseDetail && (
+            <>
+              {/* Cover */}
+              {releaseDetail.cover?.[0]?.image_url && (
+                <img
+                  src={`${backendUrl}/images/${releaseDetail.cover[0].image_url}`}
+                  alt={releaseDetail.title}
+                  style={{ width: '100%', marginBottom: 16 }}
+                />
+              )}
+
+              <Typography gutterBottom>
+                <Typography component="span" fontWeight="bold">
+                  Artistes:
+                </Typography>{' '}
+                {releaseDetail.artists.map((a) => a.name).join(', ')}
+              </Typography>
+
+              <Typography gutterBottom>
+                <Typography component="span" fontWeight="bold">
+                  Labels:
+                </Typography>{' '}
+                {releaseDetail.labels.map((l) => `${l.name} (${l.catalog_number})`).join(', ')}
+              </Typography>
+
+              {releaseDetail.genres && (
+                <Typography gutterBottom>
+                  <Typography component="span" fontWeight="bold">
+                    Genres:
+                  </Typography>{' '}
+                  {releaseDetail.genres.map((g) => g.name).join(', ')}
+                </Typography>
+              )}
+
+              {releaseDetail.styles && (
+                <Typography gutterBottom>
+                  <Typography component="span" fontWeight="bold">
+                    Styles:
+                  </Typography>{' '}
+                  {releaseDetail.styles.map((s) => s.name).join(', ')}
+                </Typography>
+              )}
+
+              {releaseDetail.year > 0 && (
+                <Typography gutterBottom>
+                  <Typography component="span" fontWeight="bold">
+                    Année:
+                  </Typography>{' '}
+                  {releaseDetail.year}
+                </Typography>
+              )}
+
+              {releaseDetail.country && (
+                <Typography gutterBottom>
+                  <Typography component="span" fontWeight="bold">
+                    Pays:
+                  </Typography>{' '}
+                  {releaseDetail.country}
+                </Typography>
+              )}
+
+              {releaseDetail.barcode && (
+                <Typography gutterBottom>
+                  <Typography component="span" fontWeight="bold">
+                    Barcode:
+                  </Typography>{' '}
+                  {releaseDetail.barcode}
+                </Typography>
+              )}
+
+              {/* Tracklist */}
+              {releaseDetail.tracks && (
+                <>
+                  <Divider sx={{ my: 2 }} />
+                  <Typography variant="h6" gutterBottom>
+                    Tracklist
+                  </Typography>
+                  {releaseDetail.tracks.map((track) => (
+                    <Typography key={`${track.disc_number}-${track.position}`} variant="body2">
+                      {track.position} - {track.title}
+                    </Typography>
+                  ))}{' '}
+                </>
+              )}
+
+              {releaseDetail.notes && (
+                <>
+                  <Divider sx={{ my: 2 }} />
+                  <Typography variant="h6" gutterBottom>
+                    Notes
+                  </Typography>
+                  <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+                    {releaseDetail.notes}
+                  </Typography>
+                </>
+              )}
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+      {/* END MODAL */}
     </div>
   );
 }
