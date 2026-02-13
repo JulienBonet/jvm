@@ -6,11 +6,25 @@ import Footer from './components/Footer/Footer';
 function App() {
   return (
     <FormatProvider>
-      <Header />
-      <main>
-        <Outlet />
-      </main>
-      <Footer />
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100vh', // prend toute la hauteur de l'écran
+        }}
+      >
+        <Header />
+
+        <main
+          style={{
+            flex: 1, // pousse le footer en bas si le contenu est court
+          }}
+        >
+          <Outlet />
+        </main>
+
+        <Footer />
+      </div>
     </FormatProvider>
   );
 }
