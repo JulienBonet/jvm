@@ -7,7 +7,9 @@ function Artists() {
 
   const backendUrl = `${import.meta.env.VITE_BACKEND_URL}`;
 
-  // Fonction pour récupérer les releases depuis ton backend
+  /* =======================
+     FETCH ARTISTS
+  ======================= */
   const fetchArtists = async () => {
     try {
       const res = await fetch(`${backendUrl}/api/artist`);
@@ -22,6 +24,10 @@ function Artists() {
   useEffect(() => {
     fetchArtists();
   }, []);
+
+  /* =======================
+     RENDER
+  ======================= */
 
   return (
     <div>

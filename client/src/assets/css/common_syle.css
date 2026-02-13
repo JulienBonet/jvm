@@ -1,0 +1,6 @@
+.sticky-section {
+  position: sticky;
+  top: 64px; /* hauteur AppBar desktop */
+  z-index: 1099;
+  background: white;
+}

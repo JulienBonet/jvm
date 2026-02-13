@@ -1,24 +1,36 @@
 /* eslint-disable react/prop-types */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
+import { Box, Typography } from '@mui/material';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 function GroupHeader({ letter, isOpen, onToggle }) {
   return (
-    <div
+    <Box
       onClick={onToggle}
-      style={{
+      sx={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '12px',
-        borderBottom: '1px solid #ccc',
+        p: 1.5,
+        borderBottom: '1px solid',
+        borderColor: 'divider',
         cursor: 'pointer',
+        '&:hover': {
+          backgroundColor: 'action.hover',
+        },
       }}
     >
-      <span style={{ fontSize: '20px', fontWeight: 'bold' }}>{letter}</span>
+      <Typography fontSize={20}>{letter}</Typography>
 
-      <span style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>⌄</span>
-    </div>
+      <Box
+        sx={{
+          display: 'inline-flex',
+          transition: 'transform 0.25s ease',
+          transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+        }}
+      >
+        <KeyboardArrowDownIcon />
+      </Box>
+    </Box>
   );
 }
 

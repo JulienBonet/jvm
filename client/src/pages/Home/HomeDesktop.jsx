@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import { TextField, Select, MenuItem, Button, InputLabel, FormControl } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
@@ -140,7 +139,7 @@ function HomeDesktop() {
 
   return (
     <div className="home-desktop">
-      <section className="search_filter_section_desktop">
+      <section className="search_filter_section_desktop sticky-section">
         {/* SEARCH */}
         <TextField
           label="Search"

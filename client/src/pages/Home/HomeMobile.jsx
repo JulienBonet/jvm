@@ -1,5 +1,6 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable consistent-return */
+/* eslint-disable no-unused-vars */
 import { useEffect, useMemo, useState } from 'react';
 import './homeMobile.css';
 import {
@@ -35,6 +36,8 @@ function HomeMobile() {
   const [releaseDetail, setReleaseDetail] = useState(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+
+  console.info('releases', releases);
 
   const backendUrl = `${import.meta.env.VITE_BACKEND_URL}`;
 
@@ -241,42 +244,47 @@ function HomeMobile() {
 
   return (
     <div className="home-mobile">
-      <section className="search_filter_section_mobile">
-        {/* SELECT */}
-        <FormControl size="small" fullWidth>
-          <InputLabel>Recherche par</InputLabel>
-          <Select value={groupBy} label="Grouper par" onChange={(e) => setGroupBy(e.target.value)}>
-            <MenuItem value="title">Titres</MenuItem>
-            <MenuItem value="artist">Artistes</MenuItem>
-            <MenuItem value="label">Labels</MenuItem>
-          </Select>
-        </FormControl>
+      <section className="sticky-section">
+        <div className="search_filter_section_mobile">
+          {/* SELECT */}
+          <FormControl size="small" fullWidth>
+            <InputLabel>Recherche par</InputLabel>
+            <Select
+              value={groupBy}
+              label="Grouper par"
+              onChange={(e) => setGroupBy(e.target.value)}
+            >
+              <MenuItem value="title">Titres</MenuItem>
+              <MenuItem value="artist">Artistes</MenuItem>
+              <MenuItem value="label">Labels</MenuItem>
+            </Select>
+          </FormControl>
 
-        {/* SEARCH BAR */}
-        <TextField
-          size="small"
-          fullWidth
-          placeholder={`Rechercher ${groupBy}`}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon fontSize="small" />
-              </InputAdornment>
-            ),
-            endAdornment: search && (
-              <InputAdornment position="end">
-                <IconButton size="small" onClick={() => setSearch('')}>
-                  <ClearIcon fontSize="small" />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
+          {/* SEARCH BAR */}
+          <TextField
+            size="small"
+            fullWidth
+            placeholder={`Rechercher ${groupBy}`}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" />
+                </InputAdornment>
+              ),
+              endAdornment: search && (
+                <InputAdornment position="end">
+                  <IconButton size="small" onClick={() => setSearch('')}>
+                    <ClearIcon fontSize="small" />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </div>
+        <div style={{ borderTop: '1px dashed #ccc', marginBottom: '10px' }} />
       </section>
-
-      <div style={{ borderTop: '1px dashed #ccc' }} />
 
       {/* RELEASES SECTION */}
       <section className="releases_list_section_mobile">
