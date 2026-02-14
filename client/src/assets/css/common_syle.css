@@ -1,7 +1,10 @@
-.sticky-section {
+.sticky-section,
+.sticky-Mobile-section {
   position: sticky;
   top: 64px; /* hauteur AppBar desktop */
   z-index: 1099;
   background: white;
 }
-
+.sticky-Mobile-section {
+  top: 56px;
+}

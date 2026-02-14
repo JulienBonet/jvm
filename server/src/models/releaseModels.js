@@ -111,6 +111,17 @@ export const findReleaseById = async (releaseId) => {
     [releaseId],
   );
 
+  // External links
+  const [links] = await db.query(
+    `
+    SELECT id, platform, url
+    FROM external_link
+    WHERE entity_type = 'release'
+    AND entity_id = ?
+    `,
+    [releaseId],
+  );
+
   return {
     ...releaseData,
     cover,
@@ -119,5 +130,6 @@ export const findReleaseById = async (releaseId) => {
     genres,
     styles,
     tracks,
+    links,
   };
 };

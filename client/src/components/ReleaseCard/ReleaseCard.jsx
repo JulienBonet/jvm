@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 
 import { Card, CardMedia, CardContent, Typography } from '@mui/material';
+import LaunchIcon from '@mui/icons-material/Launch';
 
 function ReleaseCard({ release, imageBaseUrl, onClick }) {
   return (
