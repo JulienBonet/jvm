@@ -1,14 +1,7 @@
-.release_desktop_modal {
-}
 .release_desktop_modal_top_zone {
   display: flex;
   gap: 2rem;
 }
 .release_cover_area_desktop_modal {
     width: 30%
-}
-
-.release_info_area_desktop_modal {
-}
-.release_desktop_modal_down_zone {
 }

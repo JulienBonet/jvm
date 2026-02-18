@@ -28,7 +28,12 @@ function Header() {
   };
 
   return (
-    <AppBar position="sticky">
+    <AppBar
+      position="sticky"
+      sx={{
+        backgroundColor: 'var(--color-01)',
+      }}
+    >
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/* LOGO */}
         <Box

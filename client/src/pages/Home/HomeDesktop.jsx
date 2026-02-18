@@ -3,6 +3,11 @@ import { TextField, Select, MenuItem, Button, InputLabel, FormControl } from '@m
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
+import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import ReleaseCard from '../../components/ReleaseCard/ReleaseCard';
 import ReleaseDetailDialogDesktop from '../../components/ReleaseDetailDialogDesktop/ReleaseDetailDialogDesktop';
 import './homeDesktop.css';
@@ -159,6 +164,15 @@ function HomeDesktop() {
   };
 
   /* =======================
+    BUTTONS HELPER
+  ======================= */
+  const getSortIcon = (order) => {
+    if (order === 'asc') return <ArrowUpwardIcon fontSize="small" />;
+    if (order === 'desc') return <ArrowDownwardIcon fontSize="small" />;
+    return null;
+  };
+
+  /* =======================
      LINKS IN MODAL
   ======================= */
   const discogsLink = releaseDetail?.links?.find((link) => link.platform === 'discogs')?.url;
@@ -217,6 +231,9 @@ function HomeDesktop() {
         <div>
           <Button
             variant={discFilter === 'ALL' ? 'contained' : 'outlined'}
+            sx={{
+              borderRadius: '5px 0 0 5px',
+            }}
             onClick={() => setDiscFilter('ALL')}
           >
             TOUT
@@ -224,6 +241,9 @@ function HomeDesktop() {
 
           <Button
             variant={discFilter === '33T' ? 'contained' : 'outlined'}
+            sx={{
+              borderRadius: 0,
+            }}
             onClick={() => setDiscFilter('33T')}
           >
             33T
@@ -231,35 +251,46 @@ function HomeDesktop() {
 
           <Button
             variant={discFilter === '45T' ? 'contained' : 'outlined'}
+            sx={{
+              borderRadius: '0 5px 5px 0',
+            }}
             onClick={() => setDiscFilter('45T')}
           >
             45T
           </Button>
         </div>
 
-        {/* ALPHABETICAL */}
+        {/* ALPHABETICAL - CHRONOLOGICAL */}
         <div>
-          <Button variant="outlined" onClick={handleAlphaSort}>
-            A-Z{' '}
-            {(() => {
-              if (alphaOrder === 'asc') return '↑';
-              if (alphaOrder === 'desc') return '↓';
-              return '';
-            })()}
+          <Button
+            variant="outlined"
+            onClick={handleAlphaSort}
+            sx={{ borderRadius: '5px 0 0 5px', minWidth: 40 }}
+          >
+            <SortByAlphaIcon />
+            {getSortIcon(alphaOrder)}
           </Button>
-          <Button variant="outlined" onClick={handleYearSort}>
-            Year{' '}
-            {(() => {
-              if (yearOrder === 'asc') return '↑';
-              if (yearOrder === 'desc') return '↓';
-              return '';
-            })()}
+
+          <Button
+            variant="outlined"
+            onClick={handleYearSort}
+            sx={{ borderRadius: '0 5px 5px 0', minWidth: 40 }}
+          >
+            <CalendarMonthIcon />
+            {getSortIcon(yearOrder)}
           </Button>
         </div>
 
         {/* RESET */}
-        <Button color="error" variant="outlined" onClick={handleReset}>
-          RESET
+        <Button
+          variant="outlined"
+          onClick={handleReset}
+          sx={{
+            borderRadius: '5px',
+            minWidth: 40,
+          }}
+        >
+          <RestartAltIcon />
         </Button>
       </section>
 

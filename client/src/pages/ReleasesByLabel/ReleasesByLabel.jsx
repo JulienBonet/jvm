@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { Button, Typography } from '@mui/material';
-import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft';
+import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutlined';
+import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import ReleaseCard from '../../components/ReleaseCard/ReleaseCard';
 import ReleaseDetailDialogDesktop from '../../components/ReleaseDetailDialogDesktop/ReleaseDetailDialogDesktop';
 import './releasesByLabel.css';
@@ -130,6 +135,15 @@ function ReleasesByLabel() {
   };
 
   /* =======================
+    BUTTONS HELPER
+  ======================= */
+  const getSortIcon = (order) => {
+    if (order === 'asc') return <ArrowUpwardIcon fontSize="small" />;
+    if (order === 'desc') return <ArrowDownwardIcon fontSize="small" />;
+    return null;
+  };
+
+  /* =======================
      LINKS IN MODAL
   ======================= */
   const discogsLink = releaseDetail?.links?.find((link) => link.platform === 'discogs')?.url;
@@ -142,7 +156,16 @@ function ReleasesByLabel() {
     <div className="releases_by_label">
       <section className="search_filter_section_releases_label sticky-section">
         <Link to="/labels">
-          <SubdirectoryArrowLeftIcon />
+          <ArrowCircleLeftOutlinedIcon
+            fontSize="large"
+            color="primary"
+            sx={{
+              transition: '0.2s',
+              '&:hover': {
+                transform: 'scale(1.1)',
+              },
+            }}
+          />
         </Link>
 
         <Typography
@@ -160,6 +183,9 @@ function ReleasesByLabel() {
             <Button
               variant={discFilter === 'ALL' ? 'contained' : 'outlined'}
               onClick={() => setDiscFilter('ALL')}
+              sx={{
+                borderRadius: '5px 0 0 5px',
+              }}
             >
               TOUT
             </Button>
@@ -167,6 +193,9 @@ function ReleasesByLabel() {
             <Button
               variant={discFilter === '33T' ? 'contained' : 'outlined'}
               onClick={() => setDiscFilter('33T')}
+              sx={{
+                borderRadius: 0,
+              }}
             >
               33T
             </Button>
@@ -174,6 +203,9 @@ function ReleasesByLabel() {
             <Button
               variant={discFilter === '45T' ? 'contained' : 'outlined'}
               onClick={() => setDiscFilter('45T')}
+              sx={{
+                borderRadius: '0 5px 5px 0',
+              }}
             >
               45T
             </Button>
@@ -181,28 +213,35 @@ function ReleasesByLabel() {
 
           {/* ALPHABETICAL - CHRONOLOGICAL */}
           <div>
-            <Button variant="outlined" onClick={handleAlphaSort}>
-              A-Z{' '}
-              {(() => {
-                if (alphaOrder === 'asc') return '↑';
-                if (alphaOrder === 'desc') return '↓';
-                return '';
-              })()}
+            <Button
+              variant="outlined"
+              onClick={handleAlphaSort}
+              sx={{ borderRadius: '5px 0 0 5px', minWidth: 40 }}
+            >
+              <SortByAlphaIcon />
+              {getSortIcon(alphaOrder)}
             </Button>
 
-            <Button variant="outlined" onClick={handleYearSort}>
-              Year{' '}
-              {(() => {
-                if (yearOrder === 'asc') return '↑';
-                if (yearOrder === 'desc') return '↓';
-                return '';
-              })()}
+            <Button
+              variant="outlined"
+              onClick={handleYearSort}
+              sx={{ borderRadius: '0 5px 5px 0', minWidth: 40 }}
+            >
+              <CalendarMonthIcon />
+              {getSortIcon(yearOrder)}
             </Button>
           </div>
 
           {/* RESET */}
-          <Button color="error" variant="outlined" onClick={handleReset}>
-            RESET
+          <Button
+            variant="outlined"
+            onClick={handleReset}
+            sx={{
+              borderRadius: '5px',
+              minWidth: 40,
+            }}
+          >
+            <RestartAltIcon />
           </Button>
         </div>
       </section>
