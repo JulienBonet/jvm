@@ -6,6 +6,7 @@ export const findAllReleases = async () => {
         r.id,
         r.title,
         r.year,
+        r.release_type,
         GROUP_CONCAT(DISTINCT a.name SEPARATOR ', ') AS artists,
         GROUP_CONCAT(DISTINCT l.name SEPARATOR ', ') AS labels,
         GROUP_CONCAT(DISTINCT g.name SEPARATOR ', ') AS genres,
@@ -26,7 +27,7 @@ export const findAllReleases = async () => {
     LEFT JOIN disc d 
         ON d.release_id = r.id
         AND d.disc_number = 1
-    GROUP BY r.id, r.title, r.year, d.size, d.speed
+    GROUP BY r.id, r.title, r.year, r.release_type, d.size, d.speed
     ORDER BY r.id DESC;
   `);
 

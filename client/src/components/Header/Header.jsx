@@ -97,10 +97,6 @@ function Header() {
                 <ListItemButton component={NavLink} to="/labels" onClick={handleClose}>
                   <ListItemText primary="Labels" />
                 </ListItemButton>
-
-                <ListItemButton component={NavLink} to="/records" onClick={handleClose}>
-                  <ListItemText primary="Vinyles" />
-                </ListItemButton>
               </>
             )}
           </List>

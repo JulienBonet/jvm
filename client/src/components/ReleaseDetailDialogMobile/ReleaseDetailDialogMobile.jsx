@@ -8,13 +8,20 @@ import {
   Divider,
   IconButton,
   Box,
-  Button,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import LaunchIcon from '@mui/icons-material/Launch';
+import DiscogsLogo from '../../assets/images/Discogs.png';
 
-function ReleaseDetailDialogMobile({ open, onClose, releaseDetail, loadingDetail, backendUrl }) {
-  const discogsLink = releaseDetail?.links?.find((link) => link.platform === 'discogs')?.url;
+function ReleaseDetailDialogMobile({
+  open,
+  onClose,
+  releaseDetail,
+  loadingDetail,
+  imageBaseUrl,
+  discogsLink,
+}) {
+  if (!releaseDetail) return null;
+  const firstTrack = releaseDetail.tracks?.[0];
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -33,7 +40,7 @@ function ReleaseDetailDialogMobile({ open, onClose, releaseDetail, loadingDetail
             {/* Cover */}
             {releaseDetail.cover?.[0]?.image_url && (
               <img
-                src={`${backendUrl}/images/${releaseDetail.cover[0].image_url}`}
+                src={`${imageBaseUrl}/${releaseDetail.cover[0].image_url}`}
                 alt={releaseDetail.title}
                 style={{ width: '100%', marginBottom: 16 }}
               />
@@ -98,6 +105,15 @@ function ReleaseDetailDialogMobile({ open, onClose, releaseDetail, loadingDetail
               </Typography>
             )}
 
+            <Typography gutterBottom>
+              <Typography component="span" fontWeight="bold">
+                Type:
+              </Typography>{' '}
+              {releaseDetail.release_type && `${releaseDetail.release_type}`}{' '}
+              {firstTrack?.size && ` / ${firstTrack.size}`}
+              {firstTrack?.speed && ` / ${firstTrack.speed} RPM`}
+            </Typography>
+
             {/* Tracklist */}
             {releaseDetail.tracks && (
               <>
@@ -105,11 +121,25 @@ function ReleaseDetailDialogMobile({ open, onClose, releaseDetail, loadingDetail
                 <Typography variant="h6" gutterBottom>
                   Tracklist
                 </Typography>
-                {releaseDetail.tracks.map((track) => (
-                  <Typography key={`${track.disc_number}-${track.position}`} variant="body2">
-                    {track.position} - {track.title}
-                  </Typography>
-                ))}{' '}
+
+                {Object.entries(
+                  releaseDetail.tracks.reduce((acc, track) => {
+                    if (!acc[track.disc_number]) acc[track.disc_number] = [];
+                    acc[track.disc_number].push(track);
+                    return acc;
+                  }, {}),
+                ).map(([discNumber, tracks]) => (
+                  <div key={discNumber}>
+                    <Typography variant="subtitle1" gutterBottom sx={{ marginTop: '5px' }}>
+                      Disc {discNumber}
+                    </Typography>
+                    {tracks.map((track) => (
+                      <Typography key={`${track.disc_number}-${track.position}`} variant="body2">
+                        {track.position} - {track.title}
+                      </Typography>
+                    ))}
+                  </div>
+                ))}
               </>
             )}
 
@@ -129,13 +159,14 @@ function ReleaseDetailDialogMobile({ open, onClose, releaseDetail, loadingDetail
               <>
                 <Divider sx={{ my: 2 }} />
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <Button
-                    variant="outlined"
-                    startIcon={<LaunchIcon />}
-                    onClick={() => window.open(discogsLink, '_blank')}
+                  <IconButton
+                    component="a"
+                    href={discogsLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    Voir sur Discogs
-                  </Button>
+                    <img src={DiscogsLogo} alt="Discogs" style={{ height: 40 }} />
+                  </IconButton>
                 </Box>
               </>
             )}

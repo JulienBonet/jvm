@@ -35,6 +35,7 @@ function HomeMobile() {
   console.info('releaseDetail', releaseDetail);
 
   const backendUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+  const cloudinaryUrl = `${import.meta.env.VITE_CLOUDINARY_BASE_URL}`;
 
   /* =======================
      FETCH
@@ -316,6 +317,8 @@ function HomeMobile() {
         releaseDetail={releaseDetail}
         loadingDetail={loadingDetail}
         backendUrl={backendUrl}
+        imageBaseUrl={`${cloudinaryUrl}/jvm/releases`}
+        discogsLink={discogsLink}
       />
       {/* END MODAL */}
     </div>

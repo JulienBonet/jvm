@@ -16,6 +16,7 @@ function Labels() {
   console.info('labels', labels);
 
   const backendUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+  const cloudinaryUrl = `${import.meta.env.VITE_CLOUDINARY_BASE_URL}`;
 
   /* =======================
      FETCH LABELS
@@ -80,9 +81,10 @@ function Labels() {
           <Link
             key={label.id}
             to={`/label/${label.id}`}
+            state={{ labelName: label.name }}
             style={{ textDecoration: 'none', color: 'inherit' }}
           >
-            <ItemCard key={label.id} item={label} imageBaseUrl={`${backendUrl}/images`} />
+            <ItemCard key={label.id} item={label} imageBaseUrl={`${cloudinaryUrl}/jvm/labels`} />
           </Link>
         ))}
       </section>

@@ -4,21 +4,29 @@ import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
 import ReleaseCard from '../../components/ReleaseCard/ReleaseCard';
+import ReleaseDetailDialogDesktop from '../../components/ReleaseDetailDialogDesktop/ReleaseDetailDialogDesktop';
 import './homeDesktop.css';
 
 function HomeDesktop() {
   const searchRef = useRef(null);
   const [releases, setReleases] = useState([]);
   const [genres, setGenres] = useState([]);
+  // states filters
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('');
   const [discFilter, setDiscFilter] = useState('ALL');
   const [alphaOrder, setAlphaOrder] = useState(null);
   const [yearOrder, setYearOrder] = useState(null);
+  // states modal
+  const [selectedReleaseId, setSelectedReleaseId] = useState(null);
+  const [releaseDetail, setReleaseDetail] = useState(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
   console.info('releases', releases);
 
   const backendUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+  const cloudinaryUrl = `${import.meta.env.VITE_CLOUDINARY_BASE_URL}`;
 
   /* =======================
      FETCH RELEASES
@@ -126,12 +134,34 @@ function HomeDesktop() {
     });
 
   /* =======================
-     OPEN MODAL
+     HANDLERS MODAL
   ======================= */
-  const handleOpenModal = (release) => {
-    console.log('Release clicked:', release);
-    // code Modal ici
+  const handleOpenInfo = async (release) => {
+    setSelectedReleaseId(release.id);
+    setOpenModal(true);
+    setLoadingDetail(true);
+
+    try {
+      const res = await fetch(`${backendUrl}/api/release/${release.id}`);
+      const data = await res.json();
+      setReleaseDetail(data);
+    } catch (err) {
+      console.error('Erreur fetch release detail:', err);
+    } finally {
+      setLoadingDetail(false);
+    }
   };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setReleaseDetail(null);
+    setSelectedReleaseId(null);
+  };
+
+  /* =======================
+     LINKS IN MODAL
+  ======================= */
+  const discogsLink = releaseDetail?.links?.find((link) => link.platform === 'discogs')?.url;
 
   /* =======================
      RENDER
@@ -238,11 +268,22 @@ function HomeDesktop() {
           <ReleaseCard
             key={release.id}
             release={release}
-            imageBaseUrl={`${backendUrl}/images`}
-            onClick={handleOpenModal}
+            imageBaseUrl={`${cloudinaryUrl}/jvm/releases`}
+            onClick={handleOpenInfo}
           />
         ))}
       </section>
+
+      {/* MODAL */}
+      <ReleaseDetailDialogDesktop
+        open={openModal}
+        onClose={handleCloseModal}
+        releaseDetail={releaseDetail}
+        loadingDetail={loadingDetail}
+        imageBaseUrl={`${cloudinaryUrl}/jvm/releases`}
+        discogsLink={discogsLink}
+      />
+      {/* END MODAL */}
     </div>
   );
 }

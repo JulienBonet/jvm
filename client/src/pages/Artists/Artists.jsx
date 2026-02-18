@@ -16,6 +16,7 @@ function Artists() {
   console.info('artists', artists);
 
   const backendUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+  const cloudinaryUrl = `${import.meta.env.VITE_CLOUDINARY_BASE_URL}`;
 
   /* =======================
      FETCH ARTISTS
@@ -82,9 +83,10 @@ function Artists() {
           <Link
             key={artist.id}
             to={`/artist/${artist.id}`}
+            state={{ artistName: artist.name }}
             style={{ textDecoration: 'none', color: 'inherit' }}
           >
-            <ItemCard key={artist.id} item={artist} imageBaseUrl={`${backendUrl}/images`} />
+            <ItemCard key={artist.id} item={artist} imageBaseUrl={`${cloudinaryUrl}/jvm/artists`} />
           </Link>
         ))}
       </section>

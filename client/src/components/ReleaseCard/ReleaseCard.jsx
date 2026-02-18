@@ -38,7 +38,7 @@ function ReleaseCard({ release, imageBaseUrl, onClick }) {
         <Typography variant="body2">{release.labels || 'N/A'}</Typography>
 
         <Typography variant="caption">
-          {release.year} • {release.disc_size} • {release.disc_speed} RPM
+          {release.year} • {release.release_type} • {release.disc_speed} RPM
         </Typography>
       </CardContent>
     </Card>

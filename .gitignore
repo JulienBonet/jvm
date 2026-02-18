@@ -24,3 +24,9 @@ Thumbs.db
 
 # VS Code
 .vscode/
+
+# Images locales
+server/public/images/
+
+# Js Script
+server/uploadToCloudinary.js
