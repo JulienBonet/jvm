@@ -19,7 +19,9 @@ function GroupHeader({ letter, isOpen, onToggle }) {
         },
       }}
     >
-      <Typography fontSize={20}>{letter}</Typography>
+      <Typography fontSize={20} sx={{ fontFamily: 'var(--font-01)' }}>
+        {letter}
+      </Typography>
 
       <Box
         sx={{
