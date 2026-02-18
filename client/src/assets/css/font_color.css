@@ -1,12 +1,9 @@
 :root {
   /* ===== COLORS ===== */
   --color-01: #93441A;
-  --color-02: #B67332;
-  --color-03: #DAAB3A;
-  --color-04: #e5e7e6;
+  --color-01: #D6955B;
 
 
   /* ===== FONTS ===== */
-  --font-1: 'Roboto', sans-serif;
-
+  --font-01: "Orbitron", sans-serif;
 }

@@ -158,7 +158,7 @@ function ReleasesByArtist() {
         <Link to="/artists">
           <ArrowCircleLeftOutlinedIcon
             fontSize="large"
-            color="primary"
+            color="secondary"
             sx={{
               transition: '0.2s',
               '&:hover': {
@@ -172,6 +172,7 @@ function ReleasesByArtist() {
           sx={{
             fontSize: 24,
             fontWeight: 'bold',
+            fontFamily: 'var(--font-01)',
           }}
         >
           {artistName}
@@ -235,6 +236,7 @@ function ReleasesByArtist() {
           {/* RESET */}
           <Button
             variant="outlined"
+            color="secondary"
             onClick={handleReset}
             sx={{
               borderRadius: '5px',

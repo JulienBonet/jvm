@@ -158,7 +158,7 @@ function ReleasesByLabel() {
         <Link to="/labels">
           <ArrowCircleLeftOutlinedIcon
             fontSize="large"
-            color="primary"
+            color="secondary"
             sx={{
               transition: '0.2s',
               '&:hover': {
@@ -172,6 +172,7 @@ function ReleasesByLabel() {
           sx={{
             fontSize: 24,
             fontWeight: 'bold',
+            fontFamily: 'var(--font-01)',
           }}
         >
           {labelName}
@@ -235,6 +236,7 @@ function ReleasesByLabel() {
           {/* RESET */}
           <Button
             variant="outlined"
+            color="secondary"
             onClick={handleReset}
             sx={{
               borderRadius: '5px',

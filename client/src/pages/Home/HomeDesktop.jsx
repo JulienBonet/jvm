@@ -284,6 +284,7 @@ function HomeDesktop() {
         {/* RESET */}
         <Button
           variant="outlined"
+          color="secondary"
           onClick={handleReset}
           sx={{
             borderRadius: '5px',

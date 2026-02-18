@@ -12,7 +12,9 @@ function Footer() {
         backgroundColor: 'background.paper',
       }}
     >
-      <Typography variant="body2">© {new Date().getFullYear()} Ma discothèque vinyle</Typography>
+      <Typography variant="body2" sx={{ fontFamily: 'var(--font-01)' }}>
+        © {new Date().getFullYear()} | Julius Vinyl Manager
+      </Typography>
     </Box>
   );
 }
