@@ -27,6 +27,8 @@ function HomeDesktop() {
   const [releaseDetail, setReleaseDetail] = useState(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  // states loader
+  const [loadingReleases, setLoadingReleases] = useState(true);
 
   console.info('releases', releases);
 
@@ -38,18 +40,16 @@ function HomeDesktop() {
   ======================= */
   const fetchReleases = async () => {
     try {
+      setLoadingReleases(true);
       const res = await fetch(`${backendUrl}/api/release`);
       const data = await res.json();
       setReleases(data);
     } catch (err) {
       console.error('Erreur fetch releases:', err);
+    } finally {
+      setLoadingReleases(false);
     }
   };
-
-  // useEffect pour charger les données au montage
-  useEffect(() => {
-    fetchReleases();
-  }, []);
 
   /* =======================
      FETCH GENRES
@@ -295,14 +295,18 @@ function HomeDesktop() {
       </section>
 
       <section className="releases_list_section_desktop">
-        {filteredReleases.map((release) => (
-          <ReleaseCard
-            key={release.id}
-            release={release}
-            imageBaseUrl={`${cloudinaryUrl}/jvm/releases`}
-            onClick={handleOpenInfo}
-          />
-        ))}
+        {loadingReleases ? (
+          <div className="loader" />
+        ) : (
+          filteredReleases.map((release) => (
+            <ReleaseCard
+              key={release.id}
+              release={release}
+              imageBaseUrl={`${cloudinaryUrl}/jvm/releases`}
+              onClick={handleOpenInfo}
+            />
+          ))
+        )}
       </section>
 
       {/* MODAL */}

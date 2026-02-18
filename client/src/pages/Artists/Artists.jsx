@@ -12,6 +12,8 @@ function Artists() {
   // states search
   const [searchTerm, setSearchTerm] = useState('');
   const searchRef = useRef(null);
+  // states loader
+  const [loadingReleases, setLoadingReleases] = useState(true);
 
   console.info('artists', artists);
 
@@ -23,11 +25,14 @@ function Artists() {
   ======================= */
   const fetchArtists = async () => {
     try {
+      setLoadingReleases(true);
       const res = await fetch(`${backendUrl}/api/artist`);
       const data = await res.json();
       setArtists(data);
     } catch (err) {
       console.error('Erreur fetch Artists:', err);
+    } finally {
+      setLoadingReleases(false);
     }
   };
 
@@ -79,16 +84,24 @@ function Artists() {
         />
       </section>
       <section className="artists_list_section">
-        {filteredArtists.map((artist) => (
-          <Link
-            key={artist.id}
-            to={`/artist/${artist.id}`}
-            state={{ artistName: artist.name }}
-            style={{ textDecoration: 'none', color: 'inherit' }}
-          >
-            <ItemCard key={artist.id} item={artist} imageBaseUrl={`${cloudinaryUrl}/jvm/artists`} />
-          </Link>
-        ))}
+        {loadingReleases ? (
+          <div className="loader" />
+        ) : (
+          filteredArtists.map((artist) => (
+            <Link
+              key={artist.id}
+              to={`/artist/${artist.id}`}
+              state={{ artistName: artist.name }}
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              <ItemCard
+                key={artist.id}
+                item={artist}
+                imageBaseUrl={`${cloudinaryUrl}/jvm/artists`}
+              />
+            </Link>
+          ))
+        )}
       </section>
     </div>
   );

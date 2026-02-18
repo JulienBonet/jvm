@@ -12,6 +12,8 @@ function Labels() {
   // states search
   const [searchTerm, setSearchTerm] = useState('');
   const searchRef = useRef(null);
+  // states loader
+  const [loadingReleases, setLoadingReleases] = useState(true);
 
   console.info('labels', labels);
 
@@ -23,11 +25,14 @@ function Labels() {
   ======================= */
   const fetchLabels = async () => {
     try {
+      setLoadingReleases(true);
       const res = await fetch(`${backendUrl}/api/label`);
       const data = await res.json();
       setLabels(data);
     } catch (err) {
       console.error('Erreur fetch Labels:', err);
+    } finally {
+      setLoadingReleases(false);
     }
   };
 
@@ -77,16 +82,20 @@ function Labels() {
         />
       </section>
       <section className="labels_list_section">
-        {filteredLabels.map((label) => (
-          <Link
-            key={label.id}
-            to={`/label/${label.id}`}
-            state={{ labelName: label.name }}
-            style={{ textDecoration: 'none', color: 'inherit' }}
-          >
-            <ItemCard key={label.id} item={label} imageBaseUrl={`${cloudinaryUrl}/jvm/labels`} />
-          </Link>
-        ))}
+        {loadingReleases ? (
+          <div className="loader" />
+        ) : (
+          filteredLabels.map((label) => (
+            <Link
+              key={label.id}
+              to={`/label/${label.id}`}
+              state={{ labelName: label.name }}
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              <ItemCard key={label.id} item={label} imageBaseUrl={`${cloudinaryUrl}/jvm/labels`} />
+            </Link>
+          ))
+        )}
       </section>
     </div>
   );
