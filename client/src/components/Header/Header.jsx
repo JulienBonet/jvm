@@ -56,7 +56,18 @@ function Header() {
       </Toolbar>
 
       {/* DRAWER */}
-      <Drawer anchor="right" open={open} onClose={handleClose}>
+      <Drawer
+        anchor="right"
+        open={open}
+        onClose={handleClose}
+        PaperProps={{
+          sx: {
+            height: 'auto', // prend seulement la hauteur du contenu
+            minHeight: 100, // optionnel : un minimum
+            mt: 8, // optionnel : décale depuis le top si tu veux
+          },
+        }}
+      >
         <Box sx={{ width: 260 }} role="presentation">
           <List>
             {isMobile ? (
@@ -72,7 +83,12 @@ function Header() {
                     },
                   }}
                 >
-                  <ListItemText primary="33 Tours" />
+                  <ListItemText
+                    primary="33 Tours"
+                    primaryTypographyProps={{
+                      sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
+                    }}
+                  />
                 </ListItemButton>
 
                 <ListItemButton
@@ -85,22 +101,81 @@ function Header() {
                     },
                   }}
                 >
-                  <ListItemText primary="45 Tours" />
+                  <ListItemText
+                    primary="45 Tours"
+                    primaryTypographyProps={{
+                      sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
+                    }}
+                  />
                 </ListItemButton>
               </>
             ) : (
               /* 💻 DESKTOP → NAVIGATION */
               <>
-                <ListItemButton component={NavLink} to="/" onClick={handleClose}>
-                  <ListItemText primary="Accueil" />
+                <ListItemButton
+                  component={NavLink}
+                  to="/"
+                  onClick={handleClose}
+                  sx={(theme) => ({
+                    '&.active': {
+                      backgroundColor: theme.palette.primary.main,
+                      color: 'white',
+                      '&:hover': {
+                        backgroundColor: theme.palette.primary.dark,
+                      },
+                    },
+                  })}
+                >
+                  <ListItemText
+                    primary="Releases"
+                    primaryTypographyProps={{
+                      sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
+                    }}
+                  />
                 </ListItemButton>
 
-                <ListItemButton component={NavLink} to="/artists" onClick={handleClose}>
-                  <ListItemText primary="Artists" />
+                <ListItemButton
+                  component={NavLink}
+                  to="/artists"
+                  onClick={handleClose}
+                  sx={(theme) => ({
+                    '&.active': {
+                      backgroundColor: theme.palette.primary.main,
+                      color: 'white',
+                      '&:hover': {
+                        backgroundColor: theme.palette.primary.dark,
+                      },
+                    },
+                  })}
+                >
+                  <ListItemText
+                    primary="Artists"
+                    primaryTypographyProps={{
+                      sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
+                    }}
+                  />
                 </ListItemButton>
 
-                <ListItemButton component={NavLink} to="/labels" onClick={handleClose}>
-                  <ListItemText primary="Labels" />
+                <ListItemButton
+                  component={NavLink}
+                  to="/labels"
+                  onClick={handleClose}
+                  sx={(theme) => ({
+                    '&.active': {
+                      backgroundColor: theme.palette.primary.main,
+                      color: 'white',
+                      '&:hover': {
+                        backgroundColor: theme.palette.primary.dark,
+                      },
+                    },
+                  })}
+                >
+                  <ListItemText
+                    primary="Labels"
+                    primaryTypographyProps={{
+                      sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
+                    }}
+                  />
                 </ListItemButton>
               </>
             )}
