@@ -9,7 +9,9 @@ export const findMobileReleasesBySize = async (discSize) => {
       r.year,
       r.release_type,
       GROUP_CONCAT(DISTINCT a.name SEPARATOR ', ') AS artists,
+      GROUP_CONCAT(DISTINCT a.sorted_name ORDER BY a.sorted_name SEPARATOR ', ') AS artist_sorted_name,
       GROUP_CONCAT(DISTINCT l.name SEPARATOR ', ') AS labels,
+      GROUP_CONCAT(DISTINCT l.sorted_name ORDER BY l.sorted_name SEPARATOR ', ') AS label_sorted_name,
       d.size AS disc_size,
       d.speed AS disc_speed
     FROM releases r

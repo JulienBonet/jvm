@@ -90,15 +90,15 @@ function HomeMobile() {
     return trimmed.slice(article.length + 1);
   };
 
-  const normalize = (value = '') =>
-    value
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-zA-Z0-9\s]/g, '')
-      .toUpperCase()
-      .trim();
+  // const normalize = (value = '') =>
+  //   value
+  //     .normalize('NFD')
+  //     .replace(/[\u0300-\u036f]/g, '')
+  //     .replace(/[^a-zA-Z0-9\s]/g, '')
+  //     .toUpperCase()
+  //     .trim();
 
-  const looksLikePerson = (name) => name.split(' ').length === 2;
+  // const looksLikePerson = (name) => name.split(' ').length === 2;
 
   /* =======================
      SORT KEYS
@@ -110,18 +110,18 @@ function HomeMobile() {
     return match ? match[0] : '#';
   };
 
-  const getArtistSortKey = (artist) => {
-    if (!artist) return '#';
+  // const getArtistSortKey = (artist) => {
+  //   if (!artist) return '#';
 
-    const noArticle = stripLeadingArticle(artist);
+  //   const noArticle = stripLeadingArticle(artist);
 
-    if (looksLikePerson(noArticle)) {
-      const parts = noArticle.split(' ');
-      return normalize(parts[parts.length - 1]); // nom de famille
-    }
+  //   if (looksLikePerson(noArticle)) {
+  //     const parts = noArticle.split(' ');
+  //     return normalize(parts[parts.length - 1]); // nom de famille
+  //   }
 
-    return normalize(noArticle);
-  };
+  //   return normalize(noArticle);
+  // };
 
   const getGroupValue = (release) => {
     if (groupBy === 'title') return release.title ?? '';
@@ -130,10 +130,20 @@ function HomeMobile() {
     return '';
   };
 
+  // const getGroupLetter = (release) => {
+  //   if (groupBy === 'title') return getTitleSortKey(release.title);
+  //   if (groupBy === 'artist') return getArtistSortKey(release.artists)[0] || '#';
+  //   if (groupBy === 'label') return normalize(stripLeadingArticle(release.labels))[0] || '#';
+  //   return '#';
+  // };
+
   const getGroupLetter = (release) => {
     if (groupBy === 'title') return getTitleSortKey(release.title);
-    if (groupBy === 'artist') return getArtistSortKey(release.artists)[0] || '#';
-    if (groupBy === 'label') return normalize(stripLeadingArticle(release.labels))[0] || '#';
+
+    if (groupBy === 'artist') return release.artist_sorted_name?.[0]?.toUpperCase() ?? '#';
+
+    if (groupBy === 'label') return release.label_sorted_name?.[0]?.toUpperCase() ?? '#';
+
     return '#';
   };
 
@@ -156,39 +166,45 @@ function HomeMobile() {
 
     const groups = {};
 
+    // 🔹 Regroupement par lettre
     filteredReleases.forEach((release) => {
       const letter = getGroupLetter(release);
       if (!groups[letter]) groups[letter] = [];
       groups[letter].push(release);
     });
 
+    // 🔹 Tri dans chaque groupe
     Object.keys(groups).forEach((letter) => {
       groups[letter].sort((a, b) => {
         if (groupBy === 'title') {
-          return stripLeadingArticle(a.title).localeCompare(stripLeadingArticle(b.title), 'fr');
+          return stripLeadingArticle(a.title).localeCompare(stripLeadingArticle(b.title), 'fr', {
+            sensitivity: 'base',
+          });
         }
 
         if (groupBy === 'artist') {
-          const artistA = getArtistSortKey(a.artists);
-          const artistB = getArtistSortKey(b.artists);
+          const cmp = (a.artist_sorted_name || '').localeCompare(b.artist_sorted_name || '', 'fr', {
+            sensitivity: 'base',
+          });
+          if (cmp !== 0) return cmp;
 
-          if (artistA !== artistB) {
-            return artistA.localeCompare(artistB, 'fr');
-          }
-
-          return stripLeadingArticle(a.title).localeCompare(stripLeadingArticle(b.title), 'fr');
+          return stripLeadingArticle(a.title).localeCompare(stripLeadingArticle(b.title), 'fr', {
+            sensitivity: 'base',
+          });
         }
 
         if (groupBy === 'label') {
-          const labelA = getArtistSortKey(a.labels); // 👈 on réutilise la même logique
-          const labelB = getArtistSortKey(b.labels);
+          const cmp = (a.label_sorted_name || '').localeCompare(b.label_sorted_name || '', 'fr', {
+            sensitivity: 'base',
+          });
+          if (cmp !== 0) return cmp;
 
-          if (labelA !== labelB) {
-            return labelA.localeCompare(labelB, 'fr');
-          }
-
-          return stripLeadingArticle(a.title).localeCompare(stripLeadingArticle(b.title), 'fr');
+          return stripLeadingArticle(a.title).localeCompare(stripLeadingArticle(b.title), 'fr', {
+            sensitivity: 'base',
+          });
         }
+
+        return 0; // fallback sécurisé
       });
     });
 
