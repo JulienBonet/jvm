@@ -25,22 +25,22 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import '../adminPage.css';
 
-function GenresAdmin() {
-  const [genres, setGenres] = useState([]);
+function StylesAdmin() {
+  const [styles, setStyles] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   // states create genre
   const [openCreate, setOpenCreate] = useState(false);
-  const [newGenre, setNewGenre] = useState('');
+  const [newStyle, setNewStyle] = useState('');
   // states update genre
   const [openDetail, setOpenDetail] = useState(false);
-  const [selectedGenre, setSelectedGenre] = useState(null);
+  const [selectedStyle, setSelectedStyle] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [editedName, setEditedName] = useState('');
   // states delete genre
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [genreToDelete, setGenreToDelete] = useState(null);
+  const [styleToDelete, setStyleToDelete] = useState(null);
   // states pour pagination
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -65,50 +65,50 @@ function GenresAdmin() {
      FETCH
   ======================= */
 
-  const fetchGenres = async () => {
+  const fetchStyles = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const res = await fetch(`${backendUrl}/api/genre/orderbyid`);
+      const res = await fetch(`${backendUrl}/api/style/orderbyid`);
 
       if (!res.ok) throw new Error('Erreur serveur');
 
       const data = await res.json();
-      setGenres(data);
+      setStyles(data);
     } catch (err) {
       console.error(err);
-      setError('Impossible de charger les genres.');
+      setError('Impossible de charger les styles.');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchGenres();
+    fetchStyles();
   }, []);
 
   /* =======================
      DELETE
   ======================= */
 
-  const handleOpenConfirm = (genre) => {
-    setGenreToDelete(genre);
+  const handleOpenConfirm = (style) => {
+    setStyleToDelete(style);
     setConfirmOpen(true);
   };
 
   const handleDeleteConfirmed = async (id) => {
     try {
-      const res = await fetch(`${backendUrl}/api/genre/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${backendUrl}/api/style/${id}`, { method: 'DELETE' });
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message || 'Erreur suppression');
 
-      showSnackbar(`Genre supprimé !`, 'success');
-      fetchGenres();
+      showSnackbar(`Style supprimé !`, 'success');
+      fetchStyles();
     } catch (err) {
       console.error(err);
-      showSnackbar(err.message || 'Impossible de supprimer le genre.', 'error');
+      showSnackbar(err.message || 'Impossible de supprimer le style.', 'error');
     }
   };
 
@@ -117,25 +117,25 @@ function GenresAdmin() {
   ======================= */
 
   const handleCreate = async () => {
-    if (!newGenre.trim()) return;
+    if (!newStyle.trim()) return;
 
     try {
-      const res = await fetch(`${backendUrl}/api/genre`, {
+      const res = await fetch(`${backendUrl}/api/style`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name: newGenre }),
+        body: JSON.stringify({ name: newStyle }),
       });
 
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message || 'Erreur save');
 
-      showSnackbar(`Genre "${newGenre}" créé avec succès !`, 'success');
-      setNewGenre('');
+      showSnackbar(`Genre "${newStyle}" créé avec succès !`, 'success');
+      setNewStyle('');
       setOpenCreate(false);
-      fetchGenres(); // refresh automatique
+      fetchStyles(); // refresh automatique
     } catch (err) {
       console.error(err);
       setSnackbar({ open: true, message: err.message, severity: 'error' });
@@ -145,9 +145,9 @@ function GenresAdmin() {
   /* =======================
      UPDATE
   ======================= */
-  const handleOpen = (genre) => {
-    setSelectedGenre(genre);
-    setEditedName(genre.name);
+  const handleOpen = (style) => {
+    setSelectedStyle(style);
+    setEditedName(style.name);
     setEditMode(false);
     setOpenDetail(true);
   };
@@ -156,7 +156,7 @@ function GenresAdmin() {
     if (!editedName.trim()) return;
 
     try {
-      const res = await fetch(`${backendUrl}/api/genre/${selectedGenre.id}`, {
+      const res = await fetch(`${backendUrl}/api/style/${selectedStyle.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: editedName }),
@@ -166,13 +166,13 @@ function GenresAdmin() {
 
       if (!res.ok) throw new Error(data.message || 'Erreur update');
 
-      fetchGenres();
-      setSelectedGenre((prev) => ({ ...prev, name: editedName }));
+      fetchStyles();
+      setSelectedStyle((prev) => ({ ...prev, name: editedName }));
       setEditMode(false);
       showSnackbar(`Genre mis à jour en "${editedName}" !`, 'success');
     } catch (err) {
       console.error(err);
-      showSnackbar(err.message || 'Impossible de modifier le genre.', 'error');
+      showSnackbar(err.message || 'Impossible de modifier le style.', 'error');
     }
   };
 
@@ -180,9 +180,9 @@ function GenresAdmin() {
      FILTRAGE
   ======================= */
 
-  const filteredGenres = useMemo(() => {
-    return genres.filter((genre) => genre.name.toLowerCase().includes(searchTerm.toLowerCase()));
-  }, [genres, searchTerm]);
+  const filteredStyles = useMemo(() => {
+    return styles.filter((style) => style.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  }, [styles, searchTerm]);
 
   /* =======================
      PAGINATION
@@ -197,11 +197,11 @@ function GenresAdmin() {
     setPage(0); // reset à la première page
   };
 
-  const paginatedGenres = useMemo(() => {
+  const paginatedStyles = useMemo(() => {
     const start = page * rowsPerPage;
     const end = start + rowsPerPage;
-    return filteredGenres.slice(start, end);
-  }, [filteredGenres, page, rowsPerPage]);
+    return filteredStyles.slice(start, end);
+  }, [filteredStyles, page, rowsPerPage]);
 
   /* =======================
      RENDER
@@ -218,7 +218,7 @@ function GenresAdmin() {
             fontFamily: 'var(--font-01)',
           }}
         >
-          Admin Genres
+          Admin Styles
         </Typography>
         <div className="Actions-adminTopSection">
           {/* searchbar */}
@@ -267,19 +267,19 @@ function GenresAdmin() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedGenres.map((genre) => (
-                <TableRow key={genre.id}>
+              {paginatedStyles.map((style) => (
+                <TableRow key={style.id}>
                   <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }}>
-                    {genre.id}
+                    {style.id}
                   </TableCell>
                   <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }}>
-                    {genre.name}
+                    {style.name}
                   </TableCell>
                   <TableCell align="right">
-                    <IconButton onClick={() => handleOpen(genre)}>
+                    <IconButton onClick={() => handleOpen(style)}>
                       <VisibilityIcon sx={{ color: 'var(--color-03)' }} />
                     </IconButton>
-                    <IconButton color="error" onClick={() => handleOpenConfirm(genre)}>
+                    <IconButton color="error" onClick={() => handleOpenConfirm(style)}>
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>
@@ -293,7 +293,7 @@ function GenresAdmin() {
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>
           <TablePagination
             component="div"
-            count={filteredGenres.length}
+            count={filteredStyles.length}
             page={page}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
@@ -305,22 +305,22 @@ function GenresAdmin() {
 
       {/* MODAL CREATE */}
       <Dialog open={openCreate} onClose={() => setOpenCreate(false)}>
-        <DialogTitle>Créer un genre</DialogTitle>
+        <DialogTitle>Créer un Style</DialogTitle>
 
         <DialogContent>
           <TextField
             autoFocus
             margin="dense"
-            label="Nom du genre"
+            label="Nom du Style"
             fullWidth
             variant="outlined"
-            value={newGenre}
-            onChange={(e) => setNewGenre(e.target.value)}
+            value={newStyle}
+            onChange={(e) => setNewStyle(e.target.value)}
           />
         </DialogContent>
 
         <DialogActions>
-          <Button color="var(--color-02)" onClick={() => [setOpenCreate(false), setNewGenre('')]}>
+          <Button color="var(--color-02)" onClick={() => [setOpenCreate(false), setNewStyle('')]}>
             Annuler
           </Button>
           <Button
@@ -337,20 +337,20 @@ function GenresAdmin() {
 
       {/* MODAL DETAILS */}
       <Dialog open={openDetail} onClose={() => setOpenDetail(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Genre Details</DialogTitle>
+        <DialogTitle>Style Details</DialogTitle>
 
         <DialogContent dividers>
           {!editMode ? (
             <>
               <Typography variant="subtitle2">ID</Typography>
-              <Typography sx={{ mb: 2 }}>{selectedGenre?.id}</Typography>
+              <Typography sx={{ mb: 2 }}>{selectedStyle?.id}</Typography>
 
               <Typography variant="subtitle2">Nom</Typography>
-              <Typography>{selectedGenre?.name}</Typography>
+              <Typography>{selectedStyle?.name}</Typography>
             </>
           ) : (
             <TextField
-              label="Nom du genre"
+              label="Nom du style"
               fullWidth
               value={editedName}
               onChange={(e) => setEditedName(e.target.value)}
@@ -397,7 +397,7 @@ function GenresAdmin() {
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)} maxWidth="xs" fullWidth>
         <DialogTitle>Confirmer la suppression</DialogTitle>
         <DialogContent>
-          <Typography>Supprimer le genre `{genreToDelete?.name}` ?</Typography>
+          <Typography>Supprimer le style `{styleToDelete?.name}` ?</Typography>
         </DialogContent>
         <DialogActions>
           <Button color="var(--color-02)" onClick={() => setConfirmOpen(false)}>
@@ -407,7 +407,7 @@ function GenresAdmin() {
             variant="contained"
             color="error"
             onClick={() => {
-              handleDeleteConfirmed(genreToDelete.id);
+              handleDeleteConfirmed(styleToDelete.id);
               setConfirmOpen(false);
             }}
           >
@@ -419,4 +419,4 @@ function GenresAdmin() {
   );
 }
 
-export default GenresAdmin;
+export default StylesAdmin;

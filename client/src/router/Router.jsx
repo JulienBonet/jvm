@@ -7,6 +7,7 @@ import NotFound from '../pages/NotFound/NotFound';
 import ReleasesByArtist from '../pages/ReleasesByArtist/ReleasesByArtist';
 import ReleasesByLabel from '../pages/ReleasesByLabel/ReleasesByLabel';
 import GenresAdmin from '../pages/Admin/GenresAdmin/GenresAdmin';
+import StylesAdmin from '../pages/Admin/StyleAdmin/StyleAdmin';
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: '/admin/genres',
         element: <GenresAdmin />,
+      },
+      {
+        path: '/admin/styles',
+        element: <StylesAdmin />,
       },
       {
         path: '*',

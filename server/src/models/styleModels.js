@@ -3,28 +3,20 @@ import { db } from '../../db/connection.js';
 /* =========================
    GET
 ========================= */
-export const findAllGenres = async () => {
-  const [rows] = await db.query(`
-    SELECT id, name
-    FROM genre
-    ORDER BY name ASC
-  `);
-  return rows;
-};
 
-export const findAllGenresOrderById = async () => {
+export const findAllStylesOrderById = async () => {
   const [rows] = await db.query(`
     SELECT id, name
-    FROM genre
+    FROM style
     ORDER BY id DESC
   `);
   return rows;
 };
 
-export const findGenreById = async (id) => {
+export const findStyleById = async (id) => {
   const [rows] = await db.query(
     `SELECT *
-    FROM genre
+    FROM style
     WHERE id = ?
     `,
     [id],
@@ -32,10 +24,10 @@ export const findGenreById = async (id) => {
   return rows;
 };
 
-export const findGenreByName = async (name) => {
+export const findStyleByName = async (name) => {
   const [rows] = await db.query(
     `SELECT *
-     FROM genre
+     FROM style
      WHERE name = ?`,
     [name],
   );
@@ -45,23 +37,23 @@ export const findGenreByName = async (name) => {
 /* =========================
    CREATE
 ========================= */
-export const insertGenre = async (name) => {
-  const [result] = await db.query('INSERT INTO genre (name) VALUES (?)', [name]);
+export const insertStyle = async (name) => {
+  const [result] = await db.query('INSERT INTO style (name) VALUES (?)', [name]);
   return result.insertId;
 };
 
 /* =========================
    UPDATE
 ========================= */
-export const editGenreById = async (id, name) => {
-  const [result] = await db.query('UPDATE genre SET name = ? WHERE id = ?', [name, id]);
+export const editStyleById = async (id, name) => {
+  const [result] = await db.query('UPDATE style SET name = ? WHERE id = ?', [name, id]);
   return result.affectedRows;
 };
 
 /* =========================
    DELETE
 ========================= */
-export const eraseGenreById = async (id) => {
-  const [result] = await db.query('DELETE FROM genre WHERE id = ?', [id]);
+export const eraseStyleById = async (id) => {
+  const [result] = await db.query('DELETE FROM style WHERE id = ?', [id]);
   return result.affectedRows;
 };
