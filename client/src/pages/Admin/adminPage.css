@@ -1,0 +1,22 @@
+.admin_page_main {
+  margin: 1.5rem 2rem 2rem 2rem;
+}
+.adminTopSection {
+  display: flex;
+  height: 50px;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid black;
+}
+
+.Title-adminTopSection {
+  display: flex;
+  align-items: center;
+  width: 40%;
+}
+
+.Actions-adminTopSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 60%;
+}

@@ -6,6 +6,7 @@ import Labels from '../pages/Labels/Labels';
 import NotFound from '../pages/NotFound/NotFound';
 import ReleasesByArtist from '../pages/ReleasesByArtist/ReleasesByArtist';
 import ReleasesByLabel from '../pages/ReleasesByLabel/ReleasesByLabel';
+import GenresAdmin from '../pages/Admin/GenresAdmin/GenresAdmin';
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
       {
         path: '/label/:id',
         element: <ReleasesByLabel />,
+      },
+      {
+        path: '/admin/genres',
+        element: <GenresAdmin />,
       },
       {
         path: '*',

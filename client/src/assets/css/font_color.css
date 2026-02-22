@@ -1,9 +1,10 @@
 :root {
   /* ===== COLORS ===== */
-  --color-01: #93441A;
-  --color-01: #D6955B;
-
+  --color-01: #d6955b;
+  --color-02: #18534f;
+  --color-03: #430C05;
 
   /* ===== FONTS ===== */
-  --font-01: "Orbitron", sans-serif;
+  --font-01: 'Orbitron', sans-serif;
+  --font-02: 'Courier Prime', sans-serif;
 }
