@@ -223,7 +223,7 @@ function StylesAdmin() {
         <div className="Actions-adminTopSection">
           {/* searchbar */}
           <TextField
-            label="Rechercher un genre"
+            label="Rechercher un style"
             variant="outlined"
             size="small"
             margin="normal"
@@ -247,7 +247,7 @@ function StylesAdmin() {
             }}
             onClick={() => setOpenCreate(true)}
           >
-            Créer Genre
+            Créer style
           </Button>
         </div>
       </section>
@@ -334,6 +334,7 @@ function StylesAdmin() {
           </Button>
         </DialogActions>
       </Dialog>
+      {/* END MODAL CREATE */}
 
       {/* MODAL DETAILS */}
       <Dialog open={openDetail} onClose={() => setOpenDetail(false)} maxWidth="sm" fullWidth>
@@ -376,6 +377,7 @@ function StylesAdmin() {
           )}
         </DialogActions>
       </Dialog>
+      {/* END MODAL DETAILS */}
 
       {/* ALERT - SNACKBAR */}
       <Snackbar
@@ -392,6 +394,7 @@ function StylesAdmin() {
           {snackbar.message}
         </Alert>
       </Snackbar>
+      {/* END ALERT - SNACKBAR */}
 
       {/* DELETE ALERT */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)} maxWidth="xs" fullWidth>
@@ -415,6 +418,7 @@ function StylesAdmin() {
           </Button>
         </DialogActions>
       </Dialog>
+      {/* DELETE ALERT */}
     </main>
   );
 }

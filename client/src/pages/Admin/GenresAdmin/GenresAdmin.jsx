@@ -289,7 +289,7 @@ function GenresAdmin() {
           </Table>
         </div>
 
-        {/* Pagination en dehors, autonome */}
+        {/* Pagination autonome */}
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>
           <TablePagination
             component="div"
@@ -334,6 +334,7 @@ function GenresAdmin() {
           </Button>
         </DialogActions>
       </Dialog>
+      {/* END MODAL CREATE */}
 
       {/* MODAL DETAILS */}
       <Dialog open={openDetail} onClose={() => setOpenDetail(false)} maxWidth="sm" fullWidth>
@@ -376,6 +377,7 @@ function GenresAdmin() {
           )}
         </DialogActions>
       </Dialog>
+      {/* END MODAL DETAILS */}
 
       {/* ALERT - SNACKBAR */}
       <Snackbar
@@ -392,6 +394,7 @@ function GenresAdmin() {
           {snackbar.message}
         </Alert>
       </Snackbar>
+      {/* END ALERT - SNACKBAR */}
 
       {/* DELETE ALERT */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)} maxWidth="xs" fullWidth>
@@ -415,6 +418,7 @@ function GenresAdmin() {
           </Button>
         </DialogActions>
       </Dialog>
+      {/* END DELETE ALERT */}
     </main>
   );
 }
