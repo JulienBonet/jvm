@@ -177,30 +177,16 @@ function StylesAdmin() {
   };
 
   /* =======================
-     FILTRAGE
+     FILTRAGE + PAGINATION
   ======================= */
 
   const filteredStyles = useMemo(() => {
     return styles.filter((style) => style.name.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [styles, searchTerm]);
 
-  /* =======================
-     PAGINATION
-  ======================= */
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); // reset à la première page
-  };
-
   const paginatedStyles = useMemo(() => {
     const start = page * rowsPerPage;
-    const end = start + rowsPerPage;
-    return filteredStyles.slice(start, end);
+    return filteredStyles.slice(start, start + rowsPerPage);
   }, [filteredStyles, page, rowsPerPage]);
 
   /* =======================
@@ -254,54 +240,50 @@ function StylesAdmin() {
 
       {loading && <CircularProgress />}
       {error && <Typography color="error">{error}</Typography>}
-      <div style={{ width: '100%' }}>
-        <div style={{ overflowX: 'auto' }}>
-          <Table sx={{ tableLayout: 'fixed', minWidth: 400 }}>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ width: 50 }}>ID</TableCell>
-                <TableCell>Nom</TableCell>
-                <TableCell sx={{ width: 150 }} align="right">
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedStyles.map((style) => (
-                <TableRow key={style.id}>
-                  <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }}>
-                    {style.id}
-                  </TableCell>
-                  <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }}>
-                    {style.name}
-                  </TableCell>
-                  <TableCell align="right">
-                    <IconButton onClick={() => handleOpen(style)}>
-                      <VisibilityIcon sx={{ color: 'var(--color-03)' }} />
-                    </IconButton>
-                    <IconButton color="error" onClick={() => handleOpenConfirm(style)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+      <Table sx={{ tableLayout: 'fixed' }}>
+        <TableHead>
+          <TableRow>
+            <TableCell sx={{ width: '10%' }} align="center">
+              ID
+            </TableCell>
+            <TableCell sx={{ width: '80%' }} align="center">
+              NOM
+            </TableCell>
+            <TableCell sx={{ width: '10%' }} align="center">
+              ACTIONS
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {paginatedStyles.map((style) => (
+            <TableRow key={style.id}>
+              <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align="center">
+                {style.id}
+              </TableCell>
+              <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align="center">
+                {style.name}
+              </TableCell>
+              <TableCell align="center">
+                <IconButton onClick={() => handleOpen(style)}>
+                  <VisibilityIcon sx={{ color: 'var(--color-03)' }} />
+                </IconButton>
+                <IconButton color="error" onClick={() => handleOpenConfirm(style)}>
+                  <DeleteIcon />
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
-        {/* Pagination en dehors, autonome */}
-        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>
-          <TablePagination
-            component="div"
-            count={filteredStyles.length}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[5, 10, 20, 50]}
-          />
-        </div>
-      </div>
+      <TablePagination
+        component="div"
+        count={filteredStyles.length}
+        page={page}
+        onPageChange={(e, newPage) => setPage(newPage)}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
+      />
 
       {/* MODAL CREATE */}
       <Dialog open={openCreate} onClose={() => setOpenCreate(false)}>

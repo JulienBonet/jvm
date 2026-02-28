@@ -1,5 +1,9 @@
 import { db } from '../../db/connection.js';
+import cloudinary from 'cloudinary';
 
+/* =========================
+   GET
+========================= */
 export const findAllArtists = async () => {
   const [rows] = await db.query(`
     SELECT
@@ -59,4 +63,191 @@ export const findAllReleasesByArtistId = async (artistId) => {
   );
 
   return rows;
+};
+
+export const findArtistById = async (id) => {
+  const [rows] = await db.query(
+    `
+    SELECT
+      a.id,
+      a.name,
+      a.sorted_name,
+      a.discogs_id,
+      i.url AS image_url
+    FROM artist a
+    LEFT JOIN image i
+      ON i.entity_type = 'artist'
+     AND i.entity_id = a.id
+    WHERE a.id = ?;
+  `,
+    [id],
+  );
+
+  return rows;
+};
+
+export const findAllArtistsForAdmin = async () => {
+  const [rows] = await db.query(`
+    SELECT
+      a.id,
+      a.name,
+      a.sorted_name,
+      a.discogs_id,
+      img.url AS image_url,
+      COUNT(DISTINCT ra.release_id) AS release_count
+    FROM artist a
+    LEFT JOIN release_artist ra
+      ON ra.artist_id = a.id
+    LEFT JOIN image img
+      ON img.entity_type = 'artist'
+     AND img.entity_id = a.id
+    GROUP BY
+      a.id,
+      a.name,
+      a.sorted_name,
+      a.discogs_id,
+      img.url
+    ORDER BY a.id DESC
+  `);
+
+  return rows;
+};
+
+/* ===============================
+   CREATE
+================================= */
+const DEFAULT_ARTIST_IMAGE = '00_artist_default';
+
+export const createArtist = async ({ name, sorted_name, discogs_id, image_url }) => {
+  const finalSortedName = sorted_name && sorted_name.trim() !== '' ? sorted_name : name;
+
+  const [result] = await db.query(
+    `INSERT INTO artist (name, sorted_name, discogs_id)
+     VALUES (?, ?, ?)`,
+    [name, finalSortedName, discogs_id || null],
+  );
+
+  const finalImage = image_url || DEFAULT_ARTIST_IMAGE;
+
+  await db.query(
+    `INSERT INTO image (entity_type, entity_id, url)
+     VALUES ('artist', ?, ?)`,
+    [result.insertId, finalImage],
+  );
+
+  return result.insertId;
+};
+
+export const createArtistWithImage = async ({
+  connection,
+  name,
+  sorted_name,
+  discogs_id,
+  image_filename,
+}) => {
+  const finalSortedName = sorted_name && sorted_name.trim() !== '' ? sorted_name : name;
+
+  const [result] = await connection.query(
+    `INSERT INTO artist (name, sorted_name, discogs_id)
+     VALUES (?, ?, ?)`,
+    [name, finalSortedName, discogs_id || null],
+  );
+
+  const artistId = result.insertId;
+
+  await connection.query(
+    `INSERT INTO image (entity_type, entity_id, url)
+     VALUES ('artist', ?, ?)`,
+    [artistId, image_filename],
+  );
+
+  return artistId;
+};
+
+export const findArtistByName = async (connection, name) => {
+  const [rows] = await connection.query(`SELECT id FROM artist WHERE name = ?`, [name]);
+
+  return rows[0] || null;
+};
+
+/* ===============================
+   UPDATE
+================================= */
+export const updateArtistTransactional = async ({
+  connection,
+  artistId,
+  name,
+  sorted_name,
+  discogs_id,
+  image_filename,
+}) => {
+  const finalSortedName = sorted_name && sorted_name.trim() !== '' ? sorted_name : name;
+
+  await connection.query(
+    `UPDATE artist
+     SET name = ?, sorted_name = ?, discogs_id = ?
+     WHERE id = ?`,
+    [name, finalSortedName, discogs_id || null, artistId],
+  );
+
+  const [existing] = await connection.query(
+    `SELECT id FROM image
+     WHERE entity_type = 'artist'
+       AND entity_id = ?`,
+    [artistId],
+  );
+
+  if (existing.length > 0) {
+    await connection.query(
+      `UPDATE image
+       SET url = ?
+       WHERE entity_type = 'artist'
+         AND entity_id = ?`,
+      [image_filename, artistId],
+    );
+  } else {
+    await connection.query(
+      `INSERT INTO image (entity_type, entity_id, url)
+       VALUES ('artist', ?, ?)`,
+      [artistId, image_filename],
+    );
+  }
+};
+
+export const getArtistImage = async (connection, artistId) => {
+  const [rows] = await connection.query(
+    `SELECT url
+     FROM image
+     WHERE entity_type = 'artist'
+       AND entity_id = ?`,
+    [artistId],
+  );
+
+  return rows[0]?.url || '00_artist_default';
+};
+
+/* ===============================
+   DELETE
+================================= */
+
+export const deleteArtist = async (id) => {
+  // 1. récupérer l'image
+  const [rows] = await db.query(
+    `SELECT url FROM image WHERE entity_type='artist' AND entity_id=?`,
+    [id],
+  );
+  const imageUrl = rows[0]?.url;
+
+  // 2. si ce n'est pas la default, supprimer de Cloudinary
+  if (imageUrl && imageUrl !== '00_artist_default') {
+    // Extraire le public_id pour Cloudinary
+    const publicId = imageUrl.split('/').pop().split('.')[0]; // si URL complète
+    await cloudinary.v2.uploader.destroy(`jvm/artists/${publicId}`);
+  }
+
+  // 3. supprimer l’entrée dans image
+  await db.query(`DELETE FROM image WHERE entity_type='artist' AND entity_id=?`, [id]);
+
+  // 4. supprimer l’artiste
+  await db.query(`DELETE FROM artist WHERE id=?`, [id]);
 };

@@ -177,30 +177,15 @@ function GenresAdmin() {
   };
 
   /* =======================
-     FILTRAGE
+     FILTRAGE + PAGINATION
   ======================= */
-
   const filteredGenres = useMemo(() => {
-    return genres.filter((genre) => genre.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    return genres.filter((style) => style.name.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [genres, searchTerm]);
-
-  /* =======================
-     PAGINATION
-  ======================= */
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); // reset à la première page
-  };
 
   const paginatedGenres = useMemo(() => {
     const start = page * rowsPerPage;
-    const end = start + rowsPerPage;
-    return filteredGenres.slice(start, end);
+    return filteredGenres.slice(start, start + rowsPerPage);
   }, [filteredGenres, page, rowsPerPage]);
 
   /* =======================
@@ -254,54 +239,50 @@ function GenresAdmin() {
 
       {loading && <CircularProgress />}
       {error && <Typography color="error">{error}</Typography>}
-      <div style={{ width: '100%' }}>
-        <div style={{ overflowX: 'auto' }}>
-          <Table sx={{ tableLayout: 'fixed', minWidth: 400 }}>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ width: 50 }}>ID</TableCell>
-                <TableCell>Nom</TableCell>
-                <TableCell sx={{ width: 150 }} align="right">
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedGenres.map((genre) => (
-                <TableRow key={genre.id}>
-                  <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }}>
-                    {genre.id}
-                  </TableCell>
-                  <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }}>
-                    {genre.name}
-                  </TableCell>
-                  <TableCell align="right">
-                    <IconButton onClick={() => handleOpen(genre)}>
-                      <VisibilityIcon sx={{ color: 'var(--color-03)' }} />
-                    </IconButton>
-                    <IconButton color="error" onClick={() => handleOpenConfirm(genre)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+      <Table sx={{ tableLayout: 'fixed' }}>
+        <TableHead>
+          <TableRow>
+            <TableCell sx={{ width: '10%' }} align="center">
+              ID
+            </TableCell>
+            <TableCell sx={{ width: '80%' }} align="center">
+              NOM
+            </TableCell>
+            <TableCell sx={{ width: '10%' }} align="center">
+              ACTIONS
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {paginatedGenres.map((genre) => (
+            <TableRow key={genre.id}>
+              <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align="center">
+                {genre.id}
+              </TableCell>
+              <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align="center">
+                {genre.name}
+              </TableCell>
+              <TableCell align="center">
+                <IconButton onClick={() => handleOpen(genre)}>
+                  <VisibilityIcon sx={{ color: 'var(--color-03)' }} />
+                </IconButton>
+                <IconButton color="error" onClick={() => handleOpenConfirm(genre)}>
+                  <DeleteIcon />
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
-        {/* Pagination autonome */}
-        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>
-          <TablePagination
-            component="div"
-            count={filteredGenres.length}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[5, 10, 20, 50]}
-          />
-        </div>
-      </div>
+      <TablePagination
+        component="div"
+        count={filteredGenres.length}
+        page={page}
+        onPageChange={(e, newPage) => setPage(newPage)}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
+      />
 
       {/* MODAL CREATE */}
       <Dialog open={openCreate} onClose={() => setOpenCreate(false)}>
