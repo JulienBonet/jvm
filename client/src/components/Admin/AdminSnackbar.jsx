@@ -7,6 +7,7 @@ function AdminSnackbar({ snackbar, setSnackbar, autoHideDuration = 3000 }) {
       open={snackbar.open}
       autoHideDuration={autoHideDuration}
       onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
     >
       <Alert
         severity={snackbar.severity}

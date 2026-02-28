@@ -11,7 +11,6 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
-
 import EntityTable from '../../../components/Admin/EntityTable';
 import EntityCreateModal from '../../../components/Admin/EntityCreateModal';
 import EntityDetailModal from '../../../components/Admin/EntityDetailModal';

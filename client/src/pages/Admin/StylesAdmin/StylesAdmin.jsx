@@ -23,9 +23,16 @@ import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import EntityTable from '../../../components/Admin/EntityTable02';
+import EntityCreateModal from '../../../components/Admin/EntityCreateModal02';
+import EntityDetailModal from '../../../components/Admin/EntityDetailModal02';
+import DeleteConfirmDialog from '../../../components/Admin/DeleteConfirmDialog';
+import AdminSnackbar from '../../../components/Admin/AdminSnackbar';
 import '../adminPage.css';
 
 function StylesAdmin() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
   const [styles, setStyles] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
@@ -50,8 +57,6 @@ function StylesAdmin() {
     message: '',
     severity: 'success',
   });
-
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   /* =======================
      GESTION SNACKBAR
@@ -240,167 +245,53 @@ function StylesAdmin() {
 
       {loading && <CircularProgress />}
       {error && <Typography color="error">{error}</Typography>}
-      <Table sx={{ tableLayout: 'fixed' }}>
-        <TableHead>
-          <TableRow>
-            <TableCell sx={{ width: '10%' }} align="center">
-              ID
-            </TableCell>
-            <TableCell sx={{ width: '80%' }} align="center">
-              NOM
-            </TableCell>
-            <TableCell sx={{ width: '10%' }} align="center">
-              ACTIONS
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {paginatedStyles.map((style) => (
-            <TableRow key={style.id}>
-              <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align="center">
-                {style.id}
-              </TableCell>
-              <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align="center">
-                {style.name}
-              </TableCell>
-              <TableCell align="center">
-                <IconButton onClick={() => handleOpen(style)}>
-                  <VisibilityIcon sx={{ color: 'var(--color-03)' }} />
-                </IconButton>
-                <IconButton color="error" onClick={() => handleOpenConfirm(style)}>
-                  <DeleteIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
 
-      <TablePagination
-        component="div"
-        count={filteredStyles.length}
+      <EntityTable
+        data={paginatedStyles}
+        handleOpen={handleOpen}
+        handleOpenConfirm={handleOpenConfirm}
+        filteredItems={filteredStyles}
         page={page}
-        onPageChange={(e, newPage) => setPage(newPage)}
+        setPage={setPage}
         rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
+        setRowsPerPage={setRowsPerPage}
       />
 
-      {/* MODAL CREATE */}
-      <Dialog open={openCreate} onClose={() => setOpenCreate(false)}>
-        <DialogTitle>Créer un Style</DialogTitle>
+      <EntityCreateModal
+        open={openCreate}
+        title="Créer un Style"
+        label="Nom du Style"
+        newValue={newStyle}
+        setOpenCreate={setOpenCreate}
+        setNewValue={setNewStyle}
+        handleCreate={handleCreate}
+      />
 
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Nom du Style"
-            fullWidth
-            variant="outlined"
-            value={newStyle}
-            onChange={(e) => setNewStyle(e.target.value)}
-          />
-        </DialogContent>
+      <EntityDetailModal
+        open={openDetail}
+        setOpenDetail={setOpenDetail}
+        title="Style Details"
+        label="Nom du style"
+        editMode={editMode}
+        selectedItem={selectedStyle}
+        editedName={editedName}
+        setEditedName={setEditedName}
+        setEditMode={setEditMode}
+        handleUpdate={handleUpdate}
+      />
 
-        <DialogActions>
-          <Button color="var(--color-02)" onClick={() => [setOpenCreate(false), setNewStyle('')]}>
-            Annuler
-          </Button>
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: 'var(--color-02)',
-            }}
-            onClick={handleCreate}
-          >
-            Créer
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {/* END MODAL CREATE */}
+      <DeleteConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          handleDeleteConfirmed(styleToDelete.id);
+          setConfirmOpen(false);
+        }}
+        entityName={styleToDelete?.name}
+        label="le style"
+      />
 
-      {/* MODAL DETAILS */}
-      <Dialog open={openDetail} onClose={() => setOpenDetail(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Style Details</DialogTitle>
-
-        <DialogContent dividers>
-          {!editMode ? (
-            <>
-              <Typography variant="subtitle2">ID</Typography>
-              <Typography sx={{ mb: 2 }}>{selectedStyle?.id}</Typography>
-
-              <Typography variant="subtitle2">Nom</Typography>
-              <Typography>{selectedStyle?.name}</Typography>
-            </>
-          ) : (
-            <TextField
-              label="Nom du style"
-              fullWidth
-              value={editedName}
-              onChange={(e) => setEditedName(e.target.value)}
-            />
-          )}
-        </DialogContent>
-
-        <DialogActions>
-          {!editMode ? (
-            <>
-              <Button onClick={() => setOpenDetail(false)}>Fermer</Button>
-              <Button variant="contained" onClick={() => setEditMode(true)}>
-                Edit
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button onClick={() => setEditMode(false)}>Cancel</Button>
-              <Button variant="contained" onClick={handleUpdate}>
-                Save
-              </Button>
-            </>
-          )}
-        </DialogActions>
-      </Dialog>
-      {/* END MODAL DETAILS */}
-
-      {/* ALERT - SNACKBAR */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-      {/* END ALERT - SNACKBAR */}
-
-      {/* DELETE ALERT */}
-      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>Confirmer la suppression</DialogTitle>
-        <DialogContent>
-          <Typography>Supprimer le style `{styleToDelete?.name}` ?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button color="var(--color-02)" onClick={() => setConfirmOpen(false)}>
-            Annuler
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => {
-              handleDeleteConfirmed(styleToDelete.id);
-              setConfirmOpen(false);
-            }}
-          >
-            Supprimer
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {/* DELETE ALERT */}
+      <AdminSnackbar snackbar={snackbar} setSnackbar={setSnackbar} />
     </main>
   );
 }

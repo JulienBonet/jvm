@@ -1,31 +1,17 @@
 import { useEffect, useState, useMemo } from 'react';
-import {
-  TextField,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Typography,
-  IconButton,
-  CircularProgress,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Snackbar,
-  Alert,
-  TablePagination,
-  Box,
-} from '@mui/material';
+import { TextField, Typography, IconButton, CircularProgress, Button } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
-import DeleteIcon from '@mui/icons-material/Delete';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import EntityTable from '../../../components/Admin/EntityTable02';
+import EntityCreateModal from '../../../components/Admin/EntityCreateModal02';
+import EntityDetailModal from '../../../components/Admin/EntityDetailModal02';
+import DeleteConfirmDialog from '../../../components/Admin/DeleteConfirmDialog';
+import AdminSnackbar from '../../../components/Admin/AdminSnackbar';
 import '../adminPage.css';
 
 function GenresAdmin() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
   const [genres, setGenres] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
@@ -50,8 +36,6 @@ function GenresAdmin() {
     message: '',
     severity: 'success',
   });
-
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   /* =======================
      GESTION SNACKBAR
@@ -239,167 +223,53 @@ function GenresAdmin() {
 
       {loading && <CircularProgress />}
       {error && <Typography color="error">{error}</Typography>}
-      <Table sx={{ tableLayout: 'fixed' }}>
-        <TableHead>
-          <TableRow>
-            <TableCell sx={{ width: '10%' }} align="center">
-              ID
-            </TableCell>
-            <TableCell sx={{ width: '80%' }} align="center">
-              NOM
-            </TableCell>
-            <TableCell sx={{ width: '10%' }} align="center">
-              ACTIONS
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {paginatedGenres.map((genre) => (
-            <TableRow key={genre.id}>
-              <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align="center">
-                {genre.id}
-              </TableCell>
-              <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align="center">
-                {genre.name}
-              </TableCell>
-              <TableCell align="center">
-                <IconButton onClick={() => handleOpen(genre)}>
-                  <VisibilityIcon sx={{ color: 'var(--color-03)' }} />
-                </IconButton>
-                <IconButton color="error" onClick={() => handleOpenConfirm(genre)}>
-                  <DeleteIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
 
-      <TablePagination
-        component="div"
-        count={filteredGenres.length}
+      <EntityTable
+        data={paginatedGenres}
+        handleOpen={handleOpen}
+        handleOpenConfirm={handleOpenConfirm}
+        filteredItems={filteredGenres}
         page={page}
-        onPageChange={(e, newPage) => setPage(newPage)}
+        setPage={setPage}
         rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
+        setRowsPerPage={setRowsPerPage}
       />
 
-      {/* MODAL CREATE */}
-      <Dialog open={openCreate} onClose={() => setOpenCreate(false)}>
-        <DialogTitle>Créer un genre</DialogTitle>
+      <EntityCreateModal
+        open={openCreate}
+        title="Créer un genre"
+        label="Nom du genre"
+        newValue={newGenre}
+        setOpenCreate={setOpenCreate}
+        setNewValue={setNewGenre}
+        handleCreate={handleCreate}
+      />
 
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Nom du genre"
-            fullWidth
-            variant="outlined"
-            value={newGenre}
-            onChange={(e) => setNewGenre(e.target.value)}
-          />
-        </DialogContent>
+      <EntityDetailModal
+        open={openDetail}
+        setOpenDetail={setOpenDetail}
+        title="Genre Details"
+        label="Nom du genre"
+        editMode={editMode}
+        selectedItem={selectedGenre}
+        editedName={editedName}
+        setEditedName={setEditedName}
+        setEditMode={setEditMode}
+        handleUpdate={handleUpdate}
+      />
 
-        <DialogActions>
-          <Button color="var(--color-02)" onClick={() => [setOpenCreate(false), setNewGenre('')]}>
-            Annuler
-          </Button>
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: 'var(--color-02)',
-            }}
-            onClick={handleCreate}
-          >
-            Créer
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {/* END MODAL CREATE */}
+      <DeleteConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          handleDeleteConfirmed(genreToDelete.id);
+          setConfirmOpen(false);
+        }}
+        entityName={genreToDelete?.name}
+        label="le genre"
+      />
 
-      {/* MODAL DETAILS */}
-      <Dialog open={openDetail} onClose={() => setOpenDetail(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Genre Details</DialogTitle>
-
-        <DialogContent dividers>
-          {!editMode ? (
-            <>
-              <Typography variant="subtitle2">ID</Typography>
-              <Typography sx={{ mb: 2 }}>{selectedGenre?.id}</Typography>
-
-              <Typography variant="subtitle2">Nom</Typography>
-              <Typography>{selectedGenre?.name}</Typography>
-            </>
-          ) : (
-            <TextField
-              label="Nom du genre"
-              fullWidth
-              value={editedName}
-              onChange={(e) => setEditedName(e.target.value)}
-            />
-          )}
-        </DialogContent>
-
-        <DialogActions>
-          {!editMode ? (
-            <>
-              <Button onClick={() => setOpenDetail(false)}>Fermer</Button>
-              <Button variant="contained" onClick={() => setEditMode(true)}>
-                Edit
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button onClick={() => setEditMode(false)}>Cancel</Button>
-              <Button variant="contained" onClick={handleUpdate}>
-                Save
-              </Button>
-            </>
-          )}
-        </DialogActions>
-      </Dialog>
-      {/* END MODAL DETAILS */}
-
-      {/* ALERT - SNACKBAR */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-      {/* END ALERT - SNACKBAR */}
-
-      {/* DELETE ALERT */}
-      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>Confirmer la suppression</DialogTitle>
-        <DialogContent>
-          <Typography>Supprimer le genre `{genreToDelete?.name}` ?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button color="var(--color-02)" onClick={() => setConfirmOpen(false)}>
-            Annuler
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => {
-              handleDeleteConfirmed(genreToDelete.id);
-              setConfirmOpen(false);
-            }}
-          >
-            Supprimer
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {/* END DELETE ALERT */}
+      <AdminSnackbar snackbar={snackbar} setSnackbar={setSnackbar} />
     </main>
   );
 }
