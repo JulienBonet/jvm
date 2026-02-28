@@ -6,9 +6,9 @@ import Labels from '../pages/Labels/Labels';
 import NotFound from '../pages/NotFound/NotFound';
 import ReleasesByArtist from '../pages/ReleasesByArtist/ReleasesByArtist';
 import ReleasesByLabel from '../pages/ReleasesByLabel/ReleasesByLabel';
-import ArtistsAdmin from '../pages/Admin/ArtistAdmin/ArtistAdmin';
+import ArtistsAdmin from '../pages/Admin/ArtistsAdmin/ArtistsAdmin';
 import GenresAdmin from '../pages/Admin/GenresAdmin/GenresAdmin';
-import StylesAdmin from '../pages/Admin/StyleAdmin/StyleAdmin';
+import StylesAdmin from '../pages/Admin/StylesAdmin/StylesAdmin';
 
 const router = createBrowserRouter([
   {
