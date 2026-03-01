@@ -101,7 +101,7 @@ export const createArtist = async (req, res) => {
     }
 
     // 4️⃣ Insert DB
-    const artistId = await artistModels.createArtistWithImage({
+    const artistId = await artistModels.addArtistWithImage({
       connection,
       name,
       sorted_name,
@@ -223,7 +223,7 @@ export const updateArtist = async (req, res) => {
 ========================= */
 export const deleteArtist = async (req, res) => {
   try {
-    await artistModels.deleteArtist(req.params.id);
+    await artistModels.eraseArtist(req.params.id);
     res.json({ message: 'Artist deleted' });
   } catch (error) {
     console.error(error);
@@ -234,7 +234,7 @@ export const deleteArtist = async (req, res) => {
 /* ===============================
   DISCOGS
 ================================= */
-export const previewFromDiscogs = async (req, res) => {
+export const previewArtistFromDiscogs = async (req, res) => {
   try {
     const { discogsId } = req.params;
 

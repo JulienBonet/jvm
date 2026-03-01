@@ -200,6 +200,27 @@ function Header() {
                 </ListItemButton>
                 <ListItemButton
                   component={NavLink}
+                  to="/admin/labels"
+                  onClick={handleClose}
+                  sx={(theme) => ({
+                    '&.active': {
+                      backgroundColor: theme.palette.primary.main,
+                      color: 'white',
+                      '&:hover': {
+                        backgroundColor: theme.palette.primary.dark,
+                      },
+                    },
+                  })}
+                >
+                  <ListItemText
+                    primary="Admin_labels"
+                    primaryTypographyProps={{
+                      sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
+                    }}
+                  />
+                </ListItemButton>
+                <ListItemButton
+                  component={NavLink}
                   to="/admin/genres"
                   onClick={handleClose}
                   sx={(theme) => ({

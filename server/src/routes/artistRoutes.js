@@ -13,6 +13,6 @@ router.get('/:id', artistControllers.getArtistById);
 router.put('/:id', upload.single('file'), artistControllers.updateArtist);
 router.delete('/:id', artistControllers.deleteArtist);
 router.get('/:id/releases', artistControllers.getAllReleasesByArtistId);
-router.get('/discogs-preview/:discogsId', artistControllers.previewFromDiscogs);
+router.get('/discogs-preview/:discogsId', artistControllers.previewArtistFromDiscogs);
 
 export default router;

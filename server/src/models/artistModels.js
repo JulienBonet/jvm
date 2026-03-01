@@ -118,7 +118,7 @@ export const findAllArtistsForAdmin = async () => {
 ================================= */
 const DEFAULT_ARTIST_IMAGE = '00_artist_default';
 
-export const createArtist = async ({ name, sorted_name, discogs_id, image_url }) => {
+export const addArtist = async ({ name, sorted_name, discogs_id, image_url }) => {
   const finalSortedName = sorted_name && sorted_name.trim() !== '' ? sorted_name : name;
 
   const [result] = await db.query(
@@ -138,7 +138,7 @@ export const createArtist = async ({ name, sorted_name, discogs_id, image_url })
   return result.insertId;
 };
 
-export const createArtistWithImage = async ({
+export const addArtistWithImage = async ({
   connection,
   name,
   sorted_name,
@@ -230,7 +230,7 @@ export const getArtistImage = async (connection, artistId) => {
    DELETE
 ================================= */
 
-export const deleteArtist = async (id) => {
+export const eraseArtist = async (id) => {
   // 1. récupérer l'image
   const [rows] = await db.query(
     `SELECT url FROM image WHERE entity_type='artist' AND entity_id=?`,

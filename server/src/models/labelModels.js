@@ -1,5 +1,9 @@
 import { db } from '../../db/connection.js';
+import cloudinary from 'cloudinary';
 
+/* =========================
+   GET
+========================= */
 export const findAllLabels = async () => {
   const [rows] = await db.query(`
     SELECT
@@ -11,7 +15,7 @@ export const findAllLabels = async () => {
       ON i.entity_type = 'label'
      AND i.entity_id = l.id
     GROUP BY l.id, l.name, i.url
-    ORDER BY l.name;
+    ORDER BY l.sorted_name;
   `);
 
   return rows;
@@ -57,4 +61,166 @@ export const findAllReleasesByLabelId = async (labelId) => {
   );
 
   return rows;
+};
+
+export const findAllLabelsForAdmin = async () => {
+  const [rows] = await db.query(`
+    SELECT
+      l.id,
+      l.name,
+      l.sorted_name,
+      l.discogs_id,
+      img.url AS image_url,
+      COUNT(DISTINCT rl.release_id) AS release_count
+    FROM label l
+    LEFT JOIN release_label rl
+      ON rl.label_id = l.id
+    LEFT JOIN image img
+      ON img.entity_type = 'label'
+     AND img.entity_id = l.id
+    GROUP BY
+      l.id,
+      l.name,
+      l.sorted_name,
+      l.discogs_id,
+      img.url
+    ORDER BY l.id DESC
+  `);
+
+  return rows;
+};
+
+/* ===============================
+   CREATE
+================================= */
+const DEFAULT_LABEL_IMAGE = '00_label_default';
+
+export const addLabel = async ({ name, sorted_name, discogs_id, image_url }) => {
+  const finalSortedName = sorted_name && sorted_name.trim() !== '' ? sorted_name : name;
+
+  const [result] = await db.query(
+    `INSERT INTO label (name, sorted_name, discogs_id)
+     VALUES (?, ?, ?)`,
+    [name, finalSortedName, discogs_id || null],
+  );
+
+  const finalImage = image_url || DEFAULT_LABEL_IMAGE;
+
+  await db.query(
+    `INSERT INTO label (entity_type, entity_id, url)
+     VALUES ('label', ?, ?)`,
+    [result.insertId, finalImage],
+  );
+
+  return result.insertId;
+};
+
+export const addLabelWithImage = async ({
+  connection,
+  name,
+  sorted_name,
+  discogs_id,
+  image_filename,
+}) => {
+  const finalSortedName = sorted_name && sorted_name.trim() !== '' ? sorted_name : name;
+
+  const [result] = await connection.query(
+    `INSERT INTO label (name, sorted_name, discogs_id)
+     VALUES (?, ?, ?)`,
+    [name, finalSortedName, discogs_id || null],
+  );
+
+  const labelId = result.insertId;
+
+  await connection.query(
+    `INSERT INTO image (entity_type, entity_id, url)
+     VALUES ('label', ?, ?)`,
+    [labelId, image_filename],
+  );
+
+  return labelId;
+};
+
+export const findLabelByName = async (connection, name) => {
+  const [rows] = await connection.query(`SELECT id FROM label WHERE name = ?`, [name]);
+
+  return rows[0] || null;
+};
+/* ===============================
+   UPDATE
+================================= */
+export const updateLabelTransactional = async ({
+  connection,
+  labelId,
+  name,
+  sorted_name,
+  discogs_id,
+  image_filename,
+}) => {
+  const finalSortedName = sorted_name && sorted_name.trim() !== '' ? sorted_name : name;
+
+  await connection.query(
+    `UPDATE label
+     SET name = ?, sorted_name = ?, discogs_id = ?
+     WHERE id = ?`,
+    [name, finalSortedName, discogs_id || null, labelId],
+  );
+
+  const [existing] = await connection.query(
+    `SELECT id FROM image
+     WHERE entity_type = 'label'
+       AND entity_id = ?`,
+    [labelId],
+  );
+
+  if (existing.length > 0) {
+    await connection.query(
+      `UPDATE image
+       SET url = ?
+       WHERE entity_type = 'label'
+         AND entity_id = ?`,
+      [image_filename, labelId],
+    );
+  } else {
+    await connection.query(
+      `INSERT INTO image (entity_type, entity_id, url)
+       VALUES ('label', ?, ?)`,
+      [labelId, image_filename],
+    );
+  }
+};
+export const getLabelImage = async (connection, labelId) => {
+  const [rows] = await connection.query(
+    `SELECT url
+     FROM image
+     WHERE entity_type = 'label'
+       AND entity_id = ?`,
+    [labelId],
+  );
+
+  return rows[0]?.url || '00_label_default';
+};
+/* ===============================
+   DELETE
+================================= */
+
+export const eraseLabel = async (id) => {
+  // 1. récupérer l'image
+  const [rows] = await db.query(`SELECT url FROM image WHERE entity_type='label' AND entity_id=?`, [
+    id,
+  ]);
+  const imageUrl = rows[0]?.url;
+
+  // 2. si ce n'est pas la default, supprimer de Cloudinary
+  if (imageUrl && imageUrl !== '00_label_default') {
+    // Extraire le public_id pour Cloudinary
+    const publicId = imageUrl.split('/').pop().split('.')[0]; // si URL complète
+    await cloudinary.v2.uploader.destroy(`jvm/labels/${publicId}`);
+  }
+
+  // 3. supprimer l’entrée dans image
+  await db.query(`DELETE FROM image WHERE entity_type='label' AND entity_id=?`, [id]);
+
+  // 4. supprimer le Label
+  await db.query(`DELETE FROM label WHERE id=?`, [id]);
 };
