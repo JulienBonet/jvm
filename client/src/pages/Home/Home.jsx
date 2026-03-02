@@ -1,5 +1,5 @@
-import useIsMobile from '../../hooks/useIsMobile';
-import HomeMobile from './HomeMobile';
+import useIsMobile from '../../hooks/useIsMobile.ts';
+import HomeMobile from './HomeMobile.tsx';
 import HomeDesktop from './HomeDesktop';
 
 export default function Home() {

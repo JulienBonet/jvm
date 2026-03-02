@@ -37,6 +37,8 @@ function ArtistAdmin() {
     baseEndpoint: '/api/artist',
   });
 
+  console.info('artists', artists);
+
   // -- GLOBAL STATES -- //
   const [selectedArtist, setSelectedArtist] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -160,10 +162,12 @@ function ArtistAdmin() {
       }
 
       await create(formData);
+      console.info('formData', formData);
       showSnackbar('Artiste créé avec succès', 'success');
 
       setOpenCreate(false);
       setNewArtist({ name: '', sorted_name: '', discogs_id: '', image_url: '' });
+      console.info('newArtist', newArtist);
       setPreviewNewImage(null);
       setNewImageFile(null);
     } catch (err) {

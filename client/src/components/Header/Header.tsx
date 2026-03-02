@@ -12,18 +12,19 @@ import {
   Divider,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useFormat } from '../../context/FormatContext';
-import useIsMobile from '../../hooks/useIsMobile';
+import { useFormat } from '../../context/FormatContext.js';
+import useIsMobile from '../../hooks/useIsMobile.js';
+import type { UserFormat } from '../../context/FormatContext.js';
 
 function Header() {
-  const { format, setFormat } = useFormat();
+  const { selectedFormat, setSelectedFormat } = useFormat();
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
 
   const handleClose = () => setOpen(false);
 
-  const handleFormatChange = (value) => {
-    setFormat(value);
+  const handleFormatChange = (value: UserFormat): void => {
+    setSelectedFormat(value);
     setOpen(false);
   };
 
@@ -74,12 +75,12 @@ function Header() {
               /* 📱 MOBILE → FORMAT */
               <>
                 <ListItemButton
-                  onClick={() => handleFormatChange(12)}
+                  onClick={() => handleFormatChange('LP')}
                   sx={{
-                    backgroundColor: format === 12 ? 'primary.main' : 'transparent',
-                    color: format === 12 ? 'white' : 'inherit',
+                    backgroundColor: selectedFormat === 'LP' ? 'primary.main' : 'transparent',
+                    color: selectedFormat === 'LP' ? 'white' : 'inherit',
                     '&:hover': {
-                      backgroundColor: format === 12 ? 'primary.dark' : 'action.hover',
+                      backgroundColor: selectedFormat === 'LP' ? 'primary.dark' : 'action.hover',
                     },
                   }}
                 >
@@ -92,12 +93,13 @@ function Header() {
                 </ListItemButton>
 
                 <ListItemButton
-                  onClick={() => handleFormatChange(7)}
+                  onClick={() => handleFormatChange('SINGLE')}
                   sx={{
-                    backgroundColor: format === 7 ? 'primary.main' : 'transparent',
-                    color: format === 7 ? 'white' : 'inherit',
+                    backgroundColor: selectedFormat === 'SINGLE' ? 'primary.main' : 'transparent',
+                    color: selectedFormat === 'SINGLE' ? 'white' : 'inherit',
                     '&:hover': {
-                      backgroundColor: format === 7 ? 'primary.dark' : 'action.hover',
+                      backgroundColor:
+                        selectedFormat === 'SINGLE' ? 'primary.dark' : 'action.hover',
                     },
                   }}
                 >
