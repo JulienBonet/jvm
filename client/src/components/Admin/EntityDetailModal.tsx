@@ -15,20 +15,15 @@ interface EntityModalProps {
   open: boolean;
   onClose: () => void;
   title: string;
-
   entity: BaseEntity | null;
   setEntity: React.Dispatch<React.SetStateAction<BaseEntity | null>>;
-
   editMode: boolean;
-
   onStartEdit: () => void;
   onCancelEdit: () => void;
-
   getImageSrc: () => string;
   onEditImageUpload: (file: File) => void;
   onFetchExternal: () => void;
   onSave: () => void;
-
   uploading?: boolean;
   fetching?: boolean;
 }
