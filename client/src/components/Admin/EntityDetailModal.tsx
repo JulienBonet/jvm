@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 // > ENTITY DETAIL MODAL : artists & label //
 import {
   Dialog,
@@ -10,6 +9,29 @@ import {
   Box,
   Typography,
 } from '@mui/material';
+import { BaseEntity } from '../../types/entities';
+
+interface EntityModalProps {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+
+  entity: BaseEntity | null;
+  setEntity: React.Dispatch<React.SetStateAction<BaseEntity | null>>;
+
+  editMode: boolean;
+
+  onStartEdit: () => void;
+  onCancelEdit: () => void;
+
+  getImageSrc: () => string;
+  onEditImageUpload: (file: File) => void;
+  onFetchExternal: () => void;
+  onSave: () => void;
+
+  uploading?: boolean;
+  fetching?: boolean;
+}
 
 function EntityDetailModal({
   open,
@@ -20,7 +42,9 @@ function EntityDetailModal({
   setEntity,
 
   editMode,
-  setEditMode,
+
+  onStartEdit,
+  onCancelEdit,
 
   getImageSrc,
 
@@ -31,7 +55,7 @@ function EntityDetailModal({
 
   uploading = false,
   fetching = false,
-}) {
+}: EntityModalProps) {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle align="center">{title}</DialogTitle>
@@ -85,7 +109,7 @@ function EntityDetailModal({
                 type="file"
                 hidden
                 onChange={(e) => {
-                  const file = e.target.files[0];
+                  const file = e.target.files?.[0];
                   if (!file) return;
                   onEditImageUpload(file);
                 }}
@@ -97,7 +121,10 @@ function EntityDetailModal({
               fullWidth
               sx={{ mb: 2 }}
               value={entity?.name || ''}
-              onChange={(e) => setEntity({ ...entity, name: e.target.value })}
+              onChange={(e) => {
+                if (!entity) return;
+                setEntity({ ...entity, name: e.target.value });
+              }}
             />
 
             <TextField
@@ -105,7 +132,10 @@ function EntityDetailModal({
               fullWidth
               sx={{ mb: 2 }}
               value={entity?.sorted_name || ''}
-              onChange={(e) => setEntity({ ...entity, sorted_name: e.target.value })}
+              onChange={(e) => {
+                if (!entity) return;
+                setEntity({ ...entity, sorted_name: e.target.value });
+              }}
             />
 
             <TextField
@@ -113,13 +143,17 @@ function EntityDetailModal({
               fullWidth
               sx={{ mb: 1 }}
               value={entity?.discogs_id || ''}
-              onChange={(e) => setEntity({ ...entity, discogs_id: e.target.value })}
+              onChange={(e) => {
+                if (!entity) return;
+                const value = e.target.value;
+                setEntity({ ...entity, discogs_id: value === '' ? undefined : Number(value) });
+              }}
             />
 
             <Button
               variant="outlined"
               fullWidth
-              onClick={() => onFetchExternal(entity)}
+              onClick={onFetchExternal}
               disabled={!entity?.discogs_id || fetching}
               sx={{ mb: 2 }}
             >
@@ -133,13 +167,13 @@ function EntityDetailModal({
         {!editMode ? (
           <>
             <Button onClick={onClose}>Fermer</Button>
-            <Button variant="contained" onClick={() => setEditMode(true)}>
+            <Button variant="contained" onClick={onStartEdit}>
               Edit
             </Button>
           </>
         ) : (
           <>
-            <Button onClick={() => setEditMode(false)}>Cancel</Button>
+            <Button onClick={onCancelEdit}>Cancel</Button>
 
             <Button variant="contained" onClick={onSave} disabled={uploading}>
               {uploading ? 'Uploading...' : 'Save'}

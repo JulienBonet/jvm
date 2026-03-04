@@ -188,6 +188,8 @@ export const updateArtist = async (req, res) => {
 
     await connection.commit();
 
+    const updatedArtist = await artistModels.findArtistByIdTransactional(connection, artistId);
+
     // 5️⃣ Supprimer ancienne image si remplacée
     if (uploadedFilename && currentImage && currentImage !== '00_artist_default') {
       await deleteFromCloudinary({
@@ -196,10 +198,7 @@ export const updateArtist = async (req, res) => {
       });
     }
 
-    res.json({
-      message: 'Artist updated',
-      image_filename: finalImage,
-    });
+    res.json(updatedArtist);
   } catch (error) {
     await connection.rollback();
 

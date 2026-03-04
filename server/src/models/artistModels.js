@@ -86,6 +86,27 @@ export const findArtistById = async (id) => {
   return rows;
 };
 
+export const findArtistByIdTransactional = async (connection, id) => {
+  const [rows] = await connection.query(
+    `
+    SELECT
+      a.id,
+      a.name,
+      a.sorted_name,
+      a.discogs_id,
+      i.url AS image_url
+    FROM artist a
+    LEFT JOIN image i
+      ON i.entity_type = 'artist'
+     AND i.entity_id = a.id
+    WHERE a.id = ?;
+    `,
+    [id],
+  );
+
+  return rows[0] || null;
+};
+
 export const findAllArtistsForAdmin = async () => {
   const [rows] = await db.query(`
     SELECT

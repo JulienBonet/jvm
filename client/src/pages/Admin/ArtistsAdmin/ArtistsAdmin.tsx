@@ -17,10 +17,10 @@ import EntityDetailModal from '../../../components/Admin/EntityDetailModal.jsx';
 import DeleteConfirmDialog from '../../../components/Admin/DeleteConfirmDialog.jsx';
 import AdminSnackbar from '../../../components/Admin/AdminSnackbar.jsx';
 import useCrudEntity from '../../../hooks/useCrudEntity';
-import { BaseEntityForm } from '../../../types/entities';
+import { BaseEntity, BaseEntityForm } from '../../../types/entities';
 import '../adminPage.css';
 
-interface Artist {
+interface Artist extends BaseEntity {
   id: number;
   name: string;
   sorted_name: string;
@@ -74,11 +74,14 @@ function ArtistAdmin() {
   const [uploadingNew, setUploadingNew] = useState(false);
 
   // --  UPDATE / EDIT STATES --/
+  const [originalArtist, setOriginalArtist] = useState<Artist | null>(null);
   const [openDetail, setOpenDetail] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editedArtist, setEditedArtist] = useState<Artist | null>(null);
   const [previewEditImage, setPreviewEditImage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+
+  console.info("originalArtist", originalArtist)
 
   // --  DELETE STATES --//
 
@@ -148,10 +151,11 @@ function ArtistAdmin() {
   };
 
   const handleFetchDiscogsForEdit = async () => {
-    if (!editedArtist || !editedArtist.discogs_id) return;
+    if (!editedArtist?.discogs_id) return;
 
     try {
       setFetchingDiscogs(true);
+
       const res = await fetch(
         `${backendUrl}/api/artist/discogs-preview/${editedArtist.discogs_id}`,
       );
@@ -159,14 +163,21 @@ function ArtistAdmin() {
 
       const discogsData = await res.json();
 
-      setEditedArtist({
-        ...editedArtist,
-        name: discogsData.name ?? editedArtist.name,
-        sorted_name: discogsData.sorted_name ?? editedArtist.sorted_name,
-        discogs_image_url: discogsData.image_url ?? editedArtist.discogs_image_url,
-      });
+      setEditedArtist((prev) =>
+        prev
+          ? {
+              ...prev,
+              name: discogsData.name ?? prev.name,
+              sorted_name: discogsData.sorted_name ?? prev.sorted_name,
+              discogs_image_url: discogsData.image_url ?? prev.discogs_image_url,
+            }
+          : prev,
+      );
 
-      if (discogsData.image_url) setPreviewEditImage(discogsData.image_url);
+      if (discogsData.image_url) {
+        setPreviewEditImage(discogsData.image_url);
+        setNewImageFile(null); // important
+      }
     } catch (err) {
       console.error(err);
       showSnackbar('Erreur récupération Discogs', 'error');
@@ -227,37 +238,46 @@ function ArtistAdmin() {
   // ---------------------------
   //  UPDATE ARTIST
   // ---------------------------
+
+  const startEdit = () => {
+    setOriginalArtist(editedArtist);
+    setEditMode(true);
+  };
+
+  const cancelEdit = () => {
+    setEditedArtist(originalArtist);
+    setPreviewEditImage(null);
+    setNewImageFile(null);
+    setEditMode(false);
+  };
+
   const handleUpdate = async () => {
     if (!editedArtist) return;
 
     try {
       setUploading(true);
+
       const formData = new FormData();
       formData.append('name', editedArtist.name);
       formData.append('sorted_name', editedArtist.sorted_name);
 
-      if (editedArtist.discogs_id !== undefined) {
-        formData.append('discogs_id', String(editedArtist.discogs_id));
-      }
-      if (editedArtist.discogs_image_url && !newImageFile) {
+      if (editedArtist.discogs_id) formData.append('discogs_id', String(editedArtist.discogs_id));
+
+      if (editedArtist.discogs_image_url && !newImageFile)
         formData.append('discogs_image_url', editedArtist.discogs_image_url);
-      }
+
       if (newImageFile) formData.append('file', newImageFile);
 
-      const data = await update(editedArtist.id, formData);
+      const updated = await update(editedArtist.id, formData);
 
-      setEditedArtist(data);
-
+      setEditedArtist(updated);
+      showSnackbar('Artiste mis à jour', 'success');
       setPreviewEditImage(null);
       setNewImageFile(null);
       setEditMode(false);
-      showSnackbar('Artiste mis à jour', 'success');
     } catch (err) {
-      if (err instanceof Error) {
-        showSnackbar(err.message, 'error');
-      } else {
-        showSnackbar('Erreur inconnue', 'error');
-      }
+      if (err instanceof Error) showSnackbar(err.message, 'error');
+      else showSnackbar('Erreur inconnue', 'error');
     } finally {
       setUploading(false);
     }
@@ -312,6 +332,7 @@ function ArtistAdmin() {
 
   const getEditArtistImageSrc = () => {
     if (previewEditImage) return previewEditImage;
+    if (editedArtist?.discogs_image_url) return editedArtist.discogs_image_url;
     if (!editedArtist?.image_url) return `${cloudinaryUrl}/jvm/artists/00_artist_default`;
     if (editedArtist.image_url.startsWith('http')) return editedArtist.image_url;
     return `${cloudinaryUrl}/jvm/artists/${editedArtist.image_url}?t=${Date.now()}`;
@@ -405,6 +426,13 @@ function ArtistAdmin() {
         onClose={() => {
           setOpenCreate(false);
           setPreviewNewImage(null);
+          setNewArtist({
+            name: '',
+            sorted_name: '',
+            image_url: '',
+            discogs_id: undefined,
+          });
+          setNewImageFile(null);
         }}
         onSubmit={handleCreate}
         title="Créer un Artiste"
@@ -429,6 +457,12 @@ function ArtistAdmin() {
         setEntity={setEditedArtist}
         editMode={editMode}
         setEditMode={setEditMode}
+        onStartEdit={startEdit}
+        onCancelEdit={cancelEdit}
+        originalArtist={originalArtist}
+        setEditedArtist={setEditedArtist}
+        setPreviewEditImage={setPreviewEditImage}
+        setNewImageFile={setNewImageFile}
         getImageSrc={getEditArtistImageSrc}
         onEditImageUpload={handleEditImageUpload}
         onFetchExternal={handleFetchDiscogsForEdit}
