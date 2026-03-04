@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import {
   Dialog,
   DialogTitle,
@@ -8,14 +7,22 @@ import {
   Typography,
 } from '@mui/material';
 
-function DeleteConfirmDialog({ open, onClose, onConfirm, entityName, label }) {
+interface DeleteConfirmDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  entityName?: string;
+  label: string;
+}
+
+function DeleteConfirmDialog({ open, onClose, onConfirm, entityName, label } : DeleteConfirmDialogProps) {
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Confirmer la suppression ?</DialogTitle>
 
       <DialogContent>
         <Typography>
-          Supprimer {label} : {entityName} ?
+          Supprimer {label} : {entityName ?? '…'} ?
         </Typography>
       </DialogContent>
 
