@@ -81,7 +81,7 @@ function ArtistAdmin() {
   const [previewEditImage, setPreviewEditImage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  console.info("originalArtist", originalArtist)
+  console.info('originalArtist', originalArtist);
 
   // --  DELETE STATES --//
 
@@ -456,13 +456,8 @@ function ArtistAdmin() {
         entity={editedArtist}
         setEntity={setEditedArtist}
         editMode={editMode}
-        setEditMode={setEditMode}
         onStartEdit={startEdit}
         onCancelEdit={cancelEdit}
-        originalArtist={originalArtist}
-        setEditedArtist={setEditedArtist}
-        setPreviewEditImage={setPreviewEditImage}
-        setNewImageFile={setNewImageFile}
         getImageSrc={getEditArtistImageSrc}
         onEditImageUpload={handleEditImageUpload}
         onFetchExternal={handleFetchDiscogsForEdit}

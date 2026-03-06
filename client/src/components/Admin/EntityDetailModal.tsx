@@ -11,12 +11,12 @@ import {
 } from '@mui/material';
 import { BaseEntity } from '../../types/entities';
 
-interface EntityModalProps {
+interface EntityModalProps<T extends BaseEntity> {
   open: boolean;
   onClose: () => void;
   title: string;
-  entity: BaseEntity | null;
-  setEntity: React.Dispatch<React.SetStateAction<BaseEntity | null>>;
+  entity: T | null;
+  setEntity: React.Dispatch<React.SetStateAction<T | null>>;
   editMode: boolean;
   onStartEdit: () => void;
   onCancelEdit: () => void;
@@ -28,7 +28,7 @@ interface EntityModalProps {
   fetching?: boolean;
 }
 
-function EntityDetailModal({
+function EntityDetailModal<T extends BaseEntity>({
   open,
   onClose,
   title,
@@ -50,7 +50,7 @@ function EntityDetailModal({
 
   uploading = false,
   fetching = false,
-}: EntityModalProps) {
+}: EntityModalProps<T>) {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle align="center">{title}</DialogTitle>
