@@ -9,48 +9,41 @@ import {
   Box,
   Typography,
 } from '@mui/material';
-import { BaseEntity } from '../../types/entities';
+import { BaseEntity, EntityEditor } from '../../types/entities';
+
 
 interface EntityModalProps<T extends BaseEntity> {
-  open: boolean;
-  onClose: () => void;
-  title: string;
-  entity: T | null;
-  setEntity: React.Dispatch<React.SetStateAction<T | null>>;
-  editMode: boolean;
-  onStartEdit: () => void;
-  onCancelEdit: () => void;
-  getImageSrc: () => string;
-  onEditImageUpload: (file: File) => void;
-  onFetchExternal: () => void;
-  onSave: () => void;
-  uploading?: boolean;
-  fetching?: boolean;
+  open: boolean
+  onClose: () => void
+  title: string
+
+  editor: EntityEditor<T>
+
+  getImageSrc: () => string
+  onEditImageUpload: (file: File) => void
+  onFetchExternal: () => void
 }
 
 function EntityDetailModal<T extends BaseEntity>({
   open,
   onClose,
   title,
-
-  entity,
-  setEntity,
-
-  editMode,
-
-  onStartEdit,
-  onCancelEdit,
-
+  editor,
   getImageSrc,
-
   onEditImageUpload,
-  onFetchExternal,
-
-  onSave,
-
-  uploading = false,
-  fetching = false,
+  onFetchExternal
 }: EntityModalProps<T>) {
+    const {
+    entity,
+    setEntity,
+    editMode,
+    setEditMode,
+    onStartEdit,
+    onCancelEdit,
+    onSave,
+    uploading = false,
+    fetching = false
+  } = editor
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle align="center">{title}</DialogTitle>

@@ -447,23 +447,22 @@ function ArtistAdmin() {
 
       <EntityDetailModal
         open={openDetail}
-        onClose={() => {
-          setOpenDetail(false);
-          setPreviewEditImage(null);
-          setEditMode(false);
-        }}
+        onClose={() => setOpenDetail(false)}
         title="Détails Artiste"
-        entity={editedArtist}
-        setEntity={setEditedArtist}
-        editMode={editMode}
-        onStartEdit={startEdit}
-        onCancelEdit={cancelEdit}
+        editor={{
+          entity: editedArtist,
+          setEntity: setEditedArtist,
+          editMode,
+          setEditMode,
+          onStartEdit: startEdit,
+          onCancelEdit: cancelEdit,
+          onSave: handleUpdate,
+          uploading,
+          fetching: fetchingDiscogs,
+        }}
         getImageSrc={getEditArtistImageSrc}
         onEditImageUpload={handleEditImageUpload}
         onFetchExternal={handleFetchDiscogsForEdit}
-        onSave={handleUpdate}
-        uploading={uploading}
-        fetching={fetchingDiscogs}
       />
 
       <DeleteConfirmDialog

@@ -17,7 +17,25 @@ import EntityDetailModal from '../../../components/Admin/EntityDetailModal';
 import DeleteConfirmDialog from '../../../components/Admin/DeleteConfirmDialog';
 import AdminSnackbar from '../../../components/Admin/AdminSnackbar';
 import useCrudEntity from '../../../hooks/useCrudEntity';
+import { BaseEntity, BaseEntityForm } from '../../../types/entities';
 import '../adminPage.css';
+
+interface Label extends BaseEntity {
+  id: number;
+  name: string;
+  sorted_name: string;
+  image_url: string;
+  release_count: number;
+  discogs_id?: number;
+  discogs_image_url?: string;
+}
+
+interface LabelForm extends BaseEntityForm {
+  name: string;
+  sorted_name: string;
+  image_url?: string;
+  discogs_id?: number;
+}
 
 function LabelsAdmin() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -32,37 +50,38 @@ function LabelsAdmin() {
     create,
     update,
     remove,
-  } = useCrudEntity({
+  } = useCrudEntity<Label>({
     listEndpoint: '/api/label/admin',
     baseEndpoint: '/api/label',
   });
 
   // -- GLOBAL STATES -- //
-  const [selectedLabel, setSelectedLabel] = useState(null);
+  const [selectedLabel, setSelectedLabel] = useState<Label | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   // -- CREATE STATES -- //
   const [openCreate, setOpenCreate] = useState(false);
-  const [newLabel, setNewLabel] = useState({
+  const [newLabel, setNewLabel] = useState<LabelForm>({
     name: '',
     sorted_name: '',
-    discogs_id: '',
     image_url: '',
+    discogs_id: undefined,
   });
-  const [previewNewImage, setPreviewNewImage] = useState(null);
-  const [newImageFile, setNewImageFile] = useState(null);
+  const [previewNewImage, setPreviewNewImage] = useState<string | null>(null);
+  const [newImageFile, setNewImageFile] = useState<File | null>(null);
   const [uploadingNew, setUploadingNew] = useState(false);
 
   // --  UPDATE / EDIT STATES --/
+  const [originalLabel, setOriginalLabel] = useState<Label | null>(null);
   const [openDetail, setOpenDetail] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [editedLabel, setEditedLabel] = useState({});
-  const [previewEditImage, setPreviewEditImage] = useState(null);
+  const [editedLabel, setEditedLabel] = useState<Label | null>(null);
+  const [previewEditImage, setPreviewEditImage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
   // --  DELETE STATES --//
 
-  const [labelToDelete, setLabelToDelete] = useState(null);
+  const [labelToDelete, setLabelToDelete] = useState<Label | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   // --  FETCHING EXTERNES STATES --//
@@ -75,9 +94,21 @@ function LabelsAdmin() {
 
   // --  SNACKBAR STATES --//
 
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-  const showSnackbar = (message, severity = 'success') =>
+  type SnackbarSeverity = 'success' | 'error' | 'warning' | 'info';
+
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: SnackbarSeverity;
+  }>({
+    open: false,
+    message: '',
+    severity: 'success',
+  });
+
+  const showSnackbar = (message: string, severity: SnackbarSeverity = 'success') => {
     setSnackbar({ open: true, message, severity });
+  };
 
   // ---------------------------
   //  FETCH LABEL
@@ -116,23 +147,31 @@ function LabelsAdmin() {
   };
 
   const handleFetchDiscogsForEdit = async () => {
-    if (!editedLabel.discogs_id) return;
+    if (!editedLabel?.discogs_id) return;
 
     try {
       setFetchingDiscogs(true);
-      const res = await fetch(`${backendUrl}/api/label/discogs-preview/${editedLabel.discogs_id}`);
+
+      const res = await fetch(`${backendUrl}/api/artist/discogs-preview/${editedLabel.discogs_id}`);
       if (!res.ok) throw new Error('Erreur Discogs');
 
-      const data = await res.json();
+      const discogsData = await res.json();
 
-      setEditedLabel((prev) => ({
-        ...prev,
-        name: data.name || prev.name,
-        sorted_name: data.sorted_name || prev.sorted_name,
-        discogs_image_url: data.image_url || prev.discogs_image_url,
-      }));
+      setEditedLabel((prev) =>
+        prev
+          ? {
+              ...prev,
+              name: discogsData.name ?? prev.name,
+              sorted_name: discogsData.sorted_name ?? prev.sorted_name,
+              discogs_image_url: discogsData.image_url ?? prev.discogs_image_url,
+            }
+          : prev,
+      );
 
-      if (data.image_url) setPreviewEditImage(data.image_url);
+      if (discogsData.image_url) {
+        setPreviewEditImage(discogsData.image_url);
+        setNewImageFile(null); // important
+      }
     } catch (err) {
       console.error(err);
       showSnackbar('Erreur récupération Discogs', 'error');
@@ -150,7 +189,10 @@ function LabelsAdmin() {
       const formData = new FormData();
       formData.append('name', newLabel.name);
       formData.append('sorted_name', newLabel.sorted_name);
-      formData.append('discogs_id', newLabel.discogs_id);
+
+      if (newLabel.discogs_id !== undefined) {
+        formData.append('discogs_id', String(newLabel.discogs_id));
+      }
 
       if (newImageFile) formData.append('file', newImageFile);
       if (!newImageFile && newLabel.image_url?.startsWith('http')) {
@@ -161,17 +203,21 @@ function LabelsAdmin() {
       showSnackbar('Label créé avec succès', 'success');
 
       setOpenCreate(false);
-      setNewLabel({ name: '', sorted_name: '', discogs_id: '', image_url: '' });
+      setNewLabel({ name: '', sorted_name: '', discogs_id: undefined, image_url: '' });
       setPreviewNewImage(null);
       setNewImageFile(null);
     } catch (err) {
-      showSnackbar(err.message, 'error');
+      if (err instanceof Error) {
+        showSnackbar(err.message, 'error');
+      } else {
+        showSnackbar('Erreur inconnue', 'error');
+      }
     } finally {
       setUploadingNew(false);
     }
   };
 
-  const handleNewImageUpload = (file) => {
+  const handleNewImageUpload = (file: File | null) => {
     if (!file) return;
     setNewImageFile(file);
     setPreviewNewImage(URL.createObjectURL(file));
@@ -180,6 +226,19 @@ function LabelsAdmin() {
   // ---------------------------
   //  UPDATE LABEL
   // ---------------------------
+
+  const startEdit = () => {
+    setOriginalLabel(editedLabel);
+    setEditMode(true);
+  };
+
+  const cancelEdit = () => {
+    setEditedLabel(originalLabel);
+    setPreviewEditImage(null);
+    setNewImageFile(null);
+    setEditMode(false);
+  };
+
   const handleUpdate = async () => {
     if (!editedLabel) return;
 
@@ -188,31 +247,29 @@ function LabelsAdmin() {
       const formData = new FormData();
       formData.append('name', editedLabel.name);
       formData.append('sorted_name', editedLabel.sorted_name);
-      if (editedLabel.discogs_id) formData.append('discogs_id', editedLabel.discogs_id);
+
+      if (editedLabel.discogs_id) formData.append('discogs_id', String(editedLabel.discogs_id));
       if (editedLabel.discogs_image_url && !newImageFile) {
         formData.append('discogs_image_url', editedLabel.discogs_image_url);
       }
       if (newImageFile) formData.append('file', newImageFile);
 
-      const data = await update(editedLabel.id, formData);
+      const updated = await update(editedLabel.id, formData);
 
-      setEditedLabel((prev) => ({
-        ...prev,
-        image_url: data.image_filename || prev.image_url,
-      }));
-
+      setEditedLabel(updated);
+      showSnackbar('Label mis à jour', 'success');
       setPreviewEditImage(null);
       setNewImageFile(null);
       setEditMode(false);
-      showSnackbar('Label mis à jour', 'success');
     } catch (err) {
-      showSnackbar(err.message, 'error');
+      if (err instanceof Error) showSnackbar(err.message, 'error');
+      else showSnackbar('Erreur inconnue', 'error');
     } finally {
       setUploading(false);
     }
   };
 
-  const handleEditImageUpload = (file) => {
+  const handleEditImageUpload = (file: File | null) => {
     if (!file) return;
     setNewImageFile(file);
     setPreviewEditImage(URL.createObjectURL(file));
@@ -222,13 +279,18 @@ function LabelsAdmin() {
   //  DELETE LABEL
   // ---------------------------
   const handleDeleteConfirmed = async () => {
+    if (!labelToDelete) return;
     try {
       await remove(labelToDelete.id);
       showSnackbar('Artiste supprimé', 'success');
       setConfirmOpen(false);
       setLabelToDelete(null);
     } catch (err) {
-      showSnackbar(err.message, 'error');
+      if (err instanceof Error) {
+        showSnackbar(err.message, 'error');
+      } else {
+        showSnackbar('Erreur inconnue', 'error');
+      }
     }
   };
 
@@ -347,6 +409,13 @@ function LabelsAdmin() {
         onClose={() => {
           setOpenCreate(false);
           setPreviewNewImage(null);
+          setNewLabel({
+            name: '',
+            sorted_name: '',
+            image_url: '',
+            discogs_id: undefined,
+          });
+          setNewImageFile(null);
         }}
         onSubmit={handleCreate}
         title="Créer un label"
@@ -367,16 +436,20 @@ function LabelsAdmin() {
           setEditMode(false);
         }}
         title="Détails Label"
-        entity={editedLabel}
-        setEntity={setEditedLabel}
-        editMode={editMode}
-        setEditMode={setEditMode}
+        editor={{
+          entity: editedLabel,
+          setEntity: setEditedLabel,
+          editMode,
+          setEditMode,
+          onStartEdit: startEdit,
+          onCancelEdit: cancelEdit,
+          onSave: handleUpdate,
+          uploading,
+          fetching: fetchingDiscogs,
+        }}
         getImageSrc={getEditLabelImageSrc}
         onEditImageUpload={handleEditImageUpload}
         onFetchExternal={handleFetchDiscogsForEdit}
-        onSave={handleUpdate}
-        uploading={uploading}
-        fetching={fetchingDiscogs}
       />
 
       <DeleteConfirmDialog

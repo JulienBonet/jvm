@@ -14,3 +14,18 @@ export interface BaseEntityForm {
   discogs_id?: number;
   image_url?: string;
 }
+
+export interface EntityEditor<T> {
+  entity: T | null
+  setEntity: React.Dispatch<React.SetStateAction<T | null>>
+
+  editMode: boolean
+  setEditMode: React.Dispatch<React.SetStateAction<boolean>>
+
+  onStartEdit: () => void
+  onCancelEdit: () => void
+  onSave: () => void
+
+  uploading?: boolean
+  fetching?: boolean
+}

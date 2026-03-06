@@ -6,8 +6,8 @@ import Labels from '../pages/Labels/Labels';
 import NotFound from '../pages/NotFound/NotFound';
 import ReleasesByArtist from '../pages/ReleasesByArtist/ReleasesByArtist';
 import ReleasesByLabel from '../pages/ReleasesByLabel/ReleasesByLabel';
-import ArtistsAdmin from '../pages/Admin/ArtistsAdmin/ArtistsAdmin';
-import LabelsAdmin from '../pages/Admin/LabelsAdmin/LabelsAdmin';
+import ArtistsAdmin from '../pages/Admin/ArtistsAdmin/ArtistsAdmin.tsx';
+import LabelsAdmin from '../pages/Admin/LabelsAdmin/LabelsAdmin.tsx';
 import GenresAdmin from '../pages/Admin/GenresAdmin/GenresAdmin';
 import StylesAdmin from '../pages/Admin/StylesAdmin/StylesAdmin';
 
