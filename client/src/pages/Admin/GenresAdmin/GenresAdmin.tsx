@@ -2,46 +2,60 @@ import { useEffect, useState, useMemo } from 'react';
 import { TextField, Typography, IconButton, CircularProgress, Button } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
-import EntityTable from '../../../components/Admin/EntityTable02';
-import EntityCreateModal from '../../../components/Admin/EntityCreateModal02';
-import EntityDetailModal from '../../../components/Admin/EntityDetailModal02';
+import EntityTable from '../../../components/Admin/EntityTable02.jsx';
+import EntityCreateModal from '../../../components/Admin/EntityCreateModal02.jsx';
+import EntityDetailModal from '../../../components/Admin/EntityDetailModal02.jsx';
 import DeleteConfirmDialog from '../../../components/Admin/DeleteConfirmDialog';
 import AdminSnackbar from '../../../components/Admin/AdminSnackbar';
 import '../adminPage.css';
 
+interface Genre {
+  id: number;
+  name: string;
+}
+
 function GenresAdmin() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-  const [genres, setGenres] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  // states create genre
-  const [openCreate, setOpenCreate] = useState(false);
-  const [newGenre, setNewGenre] = useState('');
-  // states update genre
-  const [openDetail, setOpenDetail] = useState(false);
-  const [selectedGenre, setSelectedGenre] = useState(null);
-  const [editMode, setEditMode] = useState(false);
-  const [editedName, setEditedName] = useState('');
-  // states delete genre
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [genreToDelete, setGenreToDelete] = useState(null);
-  // states pour pagination
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  // states snackbar
-  const [snackbar, setSnackbar] = useState({
+  // -- GLOBAL STATES -- //
+  const [genres, setGenres] = useState<Genre[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // -- CREATE STATES -- //
+  const [openCreate, setOpenCreate] = useState<boolean>(false);
+  const [newGenre, setNewGenre] = useState<string>('');
+
+  // --  UPDATE / EDIT STATES --/
+  const [originalGenre, setOriginalGenre] = useState<Genre | null>(null);
+  const [openDetail, setOpenDetail] = useState<boolean>(false);
+  const [selectedGenre, setSelectedGenre] = useState<Genre | null>(null);
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const [editedName, setEditedName] = useState<string>('');
+
+  // --  DELETE STATES --//
+  const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
+  const [genreToDelete, setGenreToDelete] = useState<Genre | null>(null);
+
+  // --  PAGINATION STATES --//
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+
+  // --  SNACKBAR STATES --//
+  type SnackbarSeverity = 'success' | 'error' | 'warning' | 'info';
+
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: SnackbarSeverity;
+  }>({
     open: false,
     message: '',
     severity: 'success',
   });
 
-  /* =======================
-     GESTION SNACKBAR
-  ======================= */
-
-  const showSnackbar = (message, severity = 'success') => {
+  const showSnackbar = (message: string, severity: SnackbarSeverity = 'success') => {
     setSnackbar({ open: true, message, severity });
   };
 
@@ -73,30 +87,6 @@ function GenresAdmin() {
   }, []);
 
   /* =======================
-     DELETE
-  ======================= */
-
-  const handleOpenConfirm = (genre) => {
-    setGenreToDelete(genre);
-    setConfirmOpen(true);
-  };
-
-  const handleDeleteConfirmed = async (id) => {
-    try {
-      const res = await fetch(`${backendUrl}/api/genre/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.message || 'Erreur suppression');
-
-      showSnackbar(`Genre supprimé !`, 'success');
-      fetchGenres();
-    } catch (err) {
-      console.error(err);
-      showSnackbar(err.message || 'Impossible de supprimer le genre.', 'error');
-    }
-  };
-
-  /* =======================
      CREATE 
   ======================= */
 
@@ -120,16 +110,32 @@ function GenresAdmin() {
       setNewGenre('');
       setOpenCreate(false);
       fetchGenres(); // refresh automatique
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
-      setSnackbar({ open: true, message: err.message, severity: 'error' });
+      if (err instanceof Error) {
+        showSnackbar(err.message, 'error');
+      } else {
+        showSnackbar('Impossible de créer le genre.', 'error');
+      }
     }
   };
 
   /* =======================
      UPDATE
   ======================= */
-  const handleOpen = (genre) => {
+
+  const startEdit = () => {
+    setOriginalGenre(selectedGenre);
+    setEditMode(true);
+  };
+
+  const cancelEdit = () => {
+    if (!originalGenre) return;
+    setEditedName(originalGenre.name);
+    setEditMode(false);
+  };
+
+  const handleOpen = (genre: Genre) => {
     setSelectedGenre(genre);
     setEditedName(genre.name);
     setEditMode(false);
@@ -138,6 +144,7 @@ function GenresAdmin() {
 
   const handleUpdate = async () => {
     if (!editedName.trim()) return;
+    if (!selectedGenre) return;
 
     try {
       const res = await fetch(`${backendUrl}/api/genre/${selectedGenre.id}`, {
@@ -146,17 +153,53 @@ function GenresAdmin() {
         body: JSON.stringify({ name: editedName }),
       });
 
-      const data = await res.json(); // récupère le message du backend
+      const data = await res.json();
 
       if (!res.ok) throw new Error(data.message || 'Erreur update');
 
       fetchGenres();
-      setSelectedGenre((prev) => ({ ...prev, name: editedName }));
+      setSelectedGenre((prev) => {
+        if (!prev) return prev;
+        return { ...prev, name: editedName };
+      });
       setEditMode(false);
       showSnackbar(`Genre mis à jour en "${editedName}" !`, 'success');
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
-      showSnackbar(err.message || 'Impossible de modifier le genre.', 'error');
+
+      if (err instanceof Error) {
+        showSnackbar(err.message, 'error');
+      } else {
+        showSnackbar('Impossible de modifier le genre.', 'error');
+      }
+    }
+  };
+
+  /* =======================
+     DELETE
+  ======================= */
+
+  const handleOpenConfirm = (genre: Genre) => {
+    setGenreToDelete(genre);
+    setConfirmOpen(true);
+  };
+
+  const handleDeleteConfirmed = async (id: number) => {
+    try {
+      const res = await fetch(`${backendUrl}/api/genre/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || 'Erreur suppression');
+
+      showSnackbar(`Genre supprimé !`, 'success');
+      fetchGenres();
+    } catch (err: unknown) {
+      console.error(err);
+      if (err instanceof Error) {
+        showSnackbar(err.message, 'error');
+      } else {
+        showSnackbar('Impossible de supprimer le genre.', 'error');
+      }
     }
   };
 
@@ -254,14 +297,16 @@ function GenresAdmin() {
         selectedItem={selectedGenre}
         editedName={editedName}
         setEditedName={setEditedName}
-        setEditMode={setEditMode}
         handleUpdate={handleUpdate}
+        startEdit={startEdit}
+        cancelEdit={cancelEdit}
       />
 
       <DeleteConfirmDialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
         onConfirm={() => {
+          if (!genreToDelete) return;
           handleDeleteConfirmed(genreToDelete.id);
           setConfirmOpen(false);
         }}

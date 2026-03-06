@@ -8,7 +8,7 @@ import ReleasesByArtist from '../pages/ReleasesByArtist/ReleasesByArtist';
 import ReleasesByLabel from '../pages/ReleasesByLabel/ReleasesByLabel';
 import ArtistsAdmin from '../pages/Admin/ArtistsAdmin/ArtistsAdmin.tsx';
 import LabelsAdmin from '../pages/Admin/LabelsAdmin/LabelsAdmin.tsx';
-import GenresAdmin from '../pages/Admin/GenresAdmin/GenresAdmin';
+import GenresAdmin from '../pages/Admin/GenresAdmin/GenresAdmin.tsx';
 import StylesAdmin from '../pages/Admin/StylesAdmin/StylesAdmin';
 
 const router = createBrowserRouter([

@@ -19,8 +19,9 @@ function EntityDetailModal02({
   selectedItem,
   editedName,
   setEditedName,
-  setEditMode,
   handleUpdate,
+  startEdit,
+  cancelEdit,
 }) {
   return (
     <Dialog open={open} onClose={() => setOpenDetail(false)} maxWidth="sm" fullWidth>
@@ -49,13 +50,13 @@ function EntityDetailModal02({
         {!editMode ? (
           <>
             <Button onClick={() => setOpenDetail(false)}>Fermer</Button>
-            <Button variant="contained" onClick={() => setEditMode(true)}>
+            <Button variant="contained" onClick={startEdit}>
               Edit
             </Button>
           </>
         ) : (
           <>
-            <Button onClick={() => setEditMode(false)}>Cancel</Button>
+            <Button onClick={cancelEdit}>Cancel</Button>
             <Button variant="contained" onClick={handleUpdate}>
               Save
             </Button>
