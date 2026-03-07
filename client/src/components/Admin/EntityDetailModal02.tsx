@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 // > ENTITY DETAIL MODAL : Genre & Style //
 import {
   TextField,
@@ -9,6 +8,25 @@ import {
   DialogContent,
   DialogActions,
 } from '@mui/material';
+
+interface EntityItem {
+  id: number;
+  name: string;
+}
+
+interface EntityDetailModalProps {
+  open: boolean;
+  setOpenDetail: React.Dispatch<React.SetStateAction<boolean>>;
+  title: string;
+  label: string;
+  editMode: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedItem: EntityItem | null;
+  editedName: string;
+  setEditedName: React.Dispatch<React.SetStateAction<string>>;
+  handleUpdate: () => void;
+  startEdit: () => void;
+  cancelEdit: () => void;
+}
 
 function EntityDetailModal02({
   open,
@@ -22,7 +40,7 @@ function EntityDetailModal02({
   handleUpdate,
   startEdit,
   cancelEdit,
-}) {
+}: EntityDetailModalProps) {
   return (
     <Dialog open={open} onClose={() => setOpenDetail(false)} maxWidth="sm" fullWidth>
       <DialogTitle>{title}</DialogTitle>

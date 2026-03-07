@@ -142,13 +142,6 @@ function GenresAdmin() {
     setEditMode(false);
   };
 
-  // const handleOpen = (genre: Genre) => {
-  //   setSelectedGenre(genre);
-  //   setEditedName(genre.name);
-  //   setEditMode(false);
-  //   setOpenDetail(true);
-  // };
-
   const handleUpdate = async () => {
     if (!editedName.trim()) return;
     if (!selectedGenre) return;
@@ -185,11 +178,6 @@ function GenresAdmin() {
   /* =======================
      DELETE
   ======================= */
-
-  // const handleOpenConfirm = (genre: Genre) => {
-  //   setGenreToDelete(genre);
-  //   setConfirmOpen(true);
-  // };
 
   const handleDeleteConfirmed = async (id: number) => {
     try {

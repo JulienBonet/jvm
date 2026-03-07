@@ -123,7 +123,9 @@ function StylesAdmin() {
      UPDATE
   ======================= */
   const startEdit = () => {
+    if (!selectedStyle) return;
     setOriginalStyle(selectedStyle);
+    setEditedName(selectedStyle.name);
     setEditMode(true);
   };
 
@@ -131,13 +133,6 @@ function StylesAdmin() {
     if (!originalStyle) return;
     setEditedName(originalStyle.name);
     setEditMode(false);
-  };
-
-  const handleOpen = (style: Style) => {
-    setSelectedStyle(style);
-    setEditedName(style.name);
-    setEditMode(false);
-    setOpenDetail(true);
   };
 
   const handleUpdate = async () => {
@@ -176,11 +171,6 @@ function StylesAdmin() {
   /* =======================
      DELETE
   ======================= */
-
-  const handleOpenConfirm = (style: Style) => {
-    setStyleToDelete(style);
-    setConfirmOpen(true);
-  };
 
   const handleDeleteConfirmed = async (id: number) => {
     try {
