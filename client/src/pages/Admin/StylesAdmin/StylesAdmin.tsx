@@ -62,7 +62,6 @@ function StylesAdmin() {
   /* =======================
      FETCH
   ======================= */
-
   const fetchStyles = async () => {
     try {
       setLoading(true);
