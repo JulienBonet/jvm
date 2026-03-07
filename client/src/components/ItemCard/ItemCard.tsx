@@ -1,9 +1,9 @@
 import { Card, CardMedia, CardContent, Typography } from '@mui/material';
-import {BaseEntity} from '../../types/shared/base.types'
+import { BaseEntity } from '../../types/shared/base.types';
 
 interface ItemCardProps {
-  item:BaseEntity;  
-  imageBaseUrl: string
+  item: BaseEntity;
+  imageBaseUrl: string;
 }
 
 function ItemCard({ item, imageBaseUrl }: ItemCardProps) {

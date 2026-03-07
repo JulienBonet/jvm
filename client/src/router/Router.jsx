@@ -4,7 +4,7 @@ import Home from '../pages/Home/Home.tsx';
 import Artists from '../pages/Artists/Artists.tsx';
 import Labels from '../pages/Labels/Labels';
 import NotFound from '../pages/NotFound/NotFound';
-import ReleasesByArtist from '../pages/ReleasesByArtist/ReleasesByArtist';
+import ReleasesByArtist from '../pages/ReleasesByArtist/ReleasesByArtist.tsx';
 import ReleasesByLabel from '../pages/ReleasesByLabel/ReleasesByLabel';
 import ArtistsAdmin from '../pages/Admin/ArtistsAdmin/ArtistsAdmin.tsx';
 import LabelsAdmin from '../pages/Admin/LabelsAdmin/LabelsAdmin.tsx';
