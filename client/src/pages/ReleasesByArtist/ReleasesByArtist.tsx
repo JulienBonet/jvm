@@ -14,7 +14,7 @@ import { Release, ReleaseMDetail } from '../../types/entities/release.types';
 
 function ReleasesByArtist() {
   // -- GLOBAL STATES -- //
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const [releases, setReleases] = useState<Release[]>([]);
 
   // -- FILTER STATES -- //
