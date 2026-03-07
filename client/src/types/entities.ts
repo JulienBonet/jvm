@@ -81,12 +81,22 @@ export interface LabelForm extends BaseEntityForm {
 // ---------- //
 
 export interface Release {
-  id: number
-  title: string
-  year: number
-  disc_size: string
-  genres?: string
-  styles?: string
+  id: number;
+  title: string;
+
+  artists?: string;
+  labels?: string;
+
+  genres?: string;
+  styles?: string;
+
+  disc_size?: string;
+  disc_speed?: number;
+
+  release_type?: string;
+  year?: number;
+
+  image_url?: string;
 }
 
 export interface Genre {

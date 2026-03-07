@@ -11,33 +11,32 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import ReleaseCard from '../../components/ReleaseCard/ReleaseCard.jsx';
 import ReleaseDetailDialogDesktop from '../../components/ReleaseDetailDialogDesktop/ReleaseDetailDialogDesktop';
-import {Release, Genre, Style, ReleaseLink, ReleaseDetail, ReleaseMDetail} from '../../types/entities'
+import { Release, Genre, Style, ReleaseMDetail } from '../../types/entities';
 import './homeDesktop.css';
-
 
 function HomeDesktop() {
   // -- GLOBAL STATES -- //
-  const searchRef = useRef<HTMLInputElement | null>(null)
-  const [releases, setReleases] = useState<Release[]>([])
-  const [genres, setGenres] = useState<Genre[]>([])
-  const [styles, setStyles] = useState<Style[]>([])
+  const searchRef = useRef<HTMLInputElement | null>(null);
+  const [releases, setReleases] = useState<Release[]>([]);
+  const [genres, setGenres] = useState<Genre[]>([]);
+  const [styles, setStyles] = useState<Style[]>([]);
 
   // -- FILTER STATES -- //
-  const [searchTerm, setSearchTerm] = useState<string>('')
-  const [selectedGenre, setSelectedGenre] = useState<string>('')
-  const [selectedStyle, setSelectedStyle] = useState<string>('')
-  const [discFilter, setDiscFilter] = useState<'ALL' | '33T' | '45T'>('ALL')
-  const [alphaOrder, setAlphaOrder] = useState<'asc' | 'desc' | null>(null)
-  const [yearOrder, setYearOrder] = useState<'asc' | 'desc' | null>(null)
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [selectedGenre, setSelectedGenre] = useState<string>('');
+  const [selectedStyle, setSelectedStyle] = useState<string>('');
+  const [discFilter, setDiscFilter] = useState<'ALL' | '33T' | '45T'>('ALL');
+  const [alphaOrder, setAlphaOrder] = useState<'asc' | 'desc' | null>(null);
+  const [yearOrder, setYearOrder] = useState<'asc' | 'desc' | null>(null);
 
   // -- MODAL STATES -- //
-  const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(null)
-  const [releaseDetail, setReleaseDetail] = useState<ReleaseMDetail | null>(null)
-  const [loadingDetail, setLoadingDetail] = useState<boolean>(false)
-  const [openModal, setOpenModal] = useState<boolean>(false)
+  const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(null);
+  const [releaseDetail, setReleaseDetail] = useState<ReleaseMDetail | null>(null);
+  const [loadingDetail, setLoadingDetail] = useState<boolean>(false);
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
   // -- LOADER STATES -- //
-  const [loadingReleases, setLoadingReleases] = useState<boolean>(true)
+  const [loadingReleases, setLoadingReleases] = useState<boolean>(true);
 
   console.info('releases', releases);
 
@@ -153,7 +152,7 @@ function HomeDesktop() {
 
       // 2️⃣ Tri chronologique
       if (yearOrder) {
-        return yearOrder === 'asc' ? a.year - b.year : b.year - a.year;
+        return yearOrder === 'asc' ? (a.year ?? 0) - (b.year ?? 0) : (b.year ?? 0) - (a.year ?? 0);
       }
 
       // 3️⃣ Pas de tri
@@ -163,7 +162,7 @@ function HomeDesktop() {
   /* =======================
      HANDLERS MODAL
   ======================= */
-  const handleOpenInfo = async (release : Release) => {
+  const handleOpenInfo = async (release: Release) => {
     setSelectedReleaseId(release.id);
     setOpenModal(true);
     setLoadingDetail(true);

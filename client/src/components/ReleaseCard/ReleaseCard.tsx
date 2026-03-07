@@ -1,9 +1,13 @@
-/* eslint-disable react/prop-types */
-
 import { Card, CardMedia, CardContent, Typography } from '@mui/material';
-import LaunchIcon from '@mui/icons-material/Launch';
+import {Release} from '../../types/entities'
 
-function ReleaseCard({ release, imageBaseUrl, onClick }) {
+interface ReleaseCardProps {
+  release: Release;
+  imageBaseUrl: string; 
+  onClick: (release: Release) => void;
+}
+
+function ReleaseCard({ release, imageBaseUrl, onClick }: ReleaseCardProps) {
   return (
     <Card
       onClick={() => onClick(release)}

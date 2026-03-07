@@ -7,8 +7,8 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import ReleaseCard from '../../components/ReleaseCard/ReleaseCard';
-import ReleaseDetailDialogDesktop from '../../components/ReleaseDetailDialogDesktop/ReleaseDetailDialogDesktop';
+import ReleaseCard from '../../components/ReleaseCard/ReleaseCard.tsx';
+import ReleaseDetailDialogDesktop from '../../components/ReleaseDetailDialogDesktop/ReleaseDetailDialogDesktop.tsx';
 import './releasesByLabel.css';
 
 function ReleasesByLabel() {
