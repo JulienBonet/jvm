@@ -67,7 +67,7 @@ function EntityTable<T extends { id: number }>({
 
               <TableCell align="center">
                 <IconButton onClick={() => onView(item)}>
-                  <VisibilityIcon />
+                  <VisibilityIcon sx={{ color: 'var(--color-03)' }} />
                 </IconButton>
                 <IconButton color="error" onClick={() => onDelete(item)}>
                   <DeleteIcon />

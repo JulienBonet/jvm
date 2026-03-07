@@ -399,13 +399,21 @@ function ArtistAdmin() {
         }
         renderRow={(artist: Artist) => (
           <>
-            <TableCell>{artist.id}</TableCell>
-            <TableCell>
+            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align='center'>
+              {artist.id}
+            </TableCell>
+            <TableCell sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Avatar src={`${cloudinaryUrl}/jvm/artists/${artist.image_url}`} />
             </TableCell>
-            <TableCell align="center">{artist.name}</TableCell>
-            <TableCell align="center">{artist.sorted_name}</TableCell>
-            <TableCell align="center">{artist.release_count}</TableCell>
+            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align='center'>
+              {artist.name}
+            </TableCell>
+            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align='center'>
+              {artist.sorted_name}
+            </TableCell>
+            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align='center'>
+              {artist.release_count}
+            </TableCell>
           </>
         )}
         onView={(artist: Artist) => {

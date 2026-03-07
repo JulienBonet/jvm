@@ -382,13 +382,13 @@ function LabelsAdmin() {
         onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
         renderRow={(label) => (
           <>
-            <TableCell>{label.id}</TableCell>
-            <TableCell>
+            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align='center'>{label.id}</TableCell>
+            <TableCell sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Avatar src={`${cloudinaryUrl}/jvm/labels/${label.image_url}`} />
             </TableCell>
-            <TableCell align="center">{label.name}</TableCell>
-            <TableCell align="center">{label.sorted_name}</TableCell>
-            <TableCell align="center">{label.release_count}</TableCell>
+            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align='center'>{label.name}</TableCell>
+            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align='center'>{label.sorted_name}</TableCell>
+            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align='center'>{label.release_count}</TableCell>
           </>
         )}
         onView={(label) => {

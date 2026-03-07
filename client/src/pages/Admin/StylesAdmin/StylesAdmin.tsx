@@ -1,8 +1,8 @@
 import { useEffect, useState, useMemo } from 'react';
-import { TextField, Typography, IconButton, CircularProgress, Button } from '@mui/material';
+import { TextField, Typography, IconButton, CircularProgress, Button, TableCell  } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
-import EntityTable from '../../../components/Admin/EntityTable02.jsx';
+import EntityTable from '../../../components/Admin/EntityTable';
 import EntityCreateModal from '../../../components/Admin/EntityCreateModal02.jsx';
 import EntityDetailModal from '../../../components/Admin/EntityDetailModal02.jsx';
 import DeleteConfirmDialog from '../../../components/Admin/DeleteConfirmDialog';
@@ -267,14 +267,33 @@ function StylesAdmin() {
       {error && <Typography color="error">{error}</Typography>}
 
       <EntityTable
+        columns={[
+          { key: 'id', label: 'ID', width: '10%' },
+          { key: 'name', label: 'NOM', width: '80%' },
+        ]}
         data={paginatedStyles}
-        handleOpen={handleOpen}
-        handleOpenConfirm={handleOpenConfirm}
-        filteredItems={filteredStyles}
+        totalCount={paginatedStyles.length}
         page={page}
-        setPage={setPage}
         rowsPerPage={rowsPerPage}
-        setRowsPerPage={setRowsPerPage}
+        onPageChange={(_e: unknown, newPage: number) => setPage(newPage)}
+        onRowsPerPageChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setRowsPerPage(parseInt(e.target.value, 10))
+        }
+        renderRow={(style: Style) => (
+          <>
+            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align="center">{style.id}</TableCell>
+            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align="center">{style.name}</TableCell>
+          </>
+        )}
+        onView={(style: Style) => {
+          setSelectedStyle(style);
+          setOpenDetail(true);
+          setEditMode(false);
+        }}
+        onDelete={(style: Style) => {
+          setStyleToDelete(style);
+          setConfirmOpen(true);
+        }}
       />
 
       <EntityCreateModal
