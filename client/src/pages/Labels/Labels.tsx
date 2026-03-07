@@ -2,18 +2,23 @@ import { useEffect, useState, useRef, useMemo } from 'react';
 import { TextField } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
+import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import { Link } from 'react-router-dom';
 import ItemCard from '../../components/ItemCard/ItemCard';
 import './label.css';
+import { Label } from '../../types/entities/label.types';
 
 function Labels() {
-  const [labels, setLabels] = useState([]);
-  // states search
-  const [searchTerm, setSearchTerm] = useState('');
-  const searchRef = useRef(null);
-  // states loader
-  const [loadingReleases, setLoadingReleases] = useState(true);
+  // -- GLOBAL STATES -- //
+  const [labels, setLabels] = useState<Label[]>([]);
+
+  // -- SEARCH STATES -- //
+  const searchRef = useRef<HTMLInputElement | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  
+  // -- LOADER STATES -- //
+  const [loadingReleases, setLoadingReleases] = useState<boolean>(false);
 
   console.info('labels', labels);
 
@@ -36,7 +41,6 @@ function Labels() {
     }
   };
 
-  // useEffect pour charger les données au montage
   useEffect(() => {
     fetchLabels();
   }, []);
@@ -65,6 +69,7 @@ function Labels() {
           inputRef={searchRef}
           onChange={(e) => setSearchTerm(e.target.value)}
           InputProps={{
+            startAdornment: <SearchIcon sx={{ mr: 1 }} />,
             endAdornment: searchTerm && (
               <InputAdornment position="end">
                 <IconButton

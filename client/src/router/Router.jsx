@@ -2,7 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import App from '../App';
 import Home from '../pages/Home/Home.tsx';
 import Artists from '../pages/Artists/Artists.tsx';
-import Labels from '../pages/Labels/Labels';
+import Labels from '../pages/Labels/Labels.tsx';
 import NotFound from '../pages/NotFound/NotFound';
 import ReleasesByArtist from '../pages/ReleasesByArtist/ReleasesByArtist.tsx';
 import ReleasesByLabel from '../pages/ReleasesByLabel/ReleasesByLabel';

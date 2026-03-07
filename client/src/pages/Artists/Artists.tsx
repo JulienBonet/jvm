@@ -18,7 +18,7 @@ function Artists() {
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   // -- LOADER STATES -- //
-  const [loadingReleases, setLoadingReleases] = useState<boolean>(true);
+  const [loadingReleases, setLoadingReleases] = useState<boolean>(false);
 
   console.info('artists', artists);
 
