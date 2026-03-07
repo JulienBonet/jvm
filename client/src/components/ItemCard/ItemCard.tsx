@@ -1,8 +1,12 @@
-/* eslint-disable react/prop-types */
-
 import { Card, CardMedia, CardContent, Typography } from '@mui/material';
+import {BaseEntity} from '../../types/shared/base.types'
 
-function ItemCard({ item, imageBaseUrl }) {
+interface ItemCardProps {
+  item:BaseEntity;  
+  imageBaseUrl: string
+}
+
+function ItemCard({ item, imageBaseUrl }: ItemCardProps) {
   return (
     <Card
       sx={{
