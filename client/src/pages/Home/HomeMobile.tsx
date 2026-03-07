@@ -14,7 +14,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useFormat } from '../../context/FormatContext.js';
 import ReleaseItemMobile from '../../components/ReleaseItemMobile/ReleaseItemMobile';
-import GroupHeader from '../../components/GroupHeader/GroupHeader.jsx';
+import GroupHeader from '../../components/GroupHeader/GroupHeader';
 import ReleaseDetailDialogMobile from '../../components/ReleaseDetailDialogMobile/ReleaseDetailDialogMobile';
 import {ReleaseMobile, ReleaseMDetail} from '../../types/entities/release.types'
 
@@ -165,7 +165,7 @@ function HomeMobile() {
   // TOGGLE GROUP
   // =======================
   const toggleGroup = (letter: string) => {
-    setOpenGroup((prev) => ({ ...prev, [letter]: !prev[letter] }));
+    setOpenGroup((prev) => ({ [letter]: !prev[letter] }));
   };
 
   useEffect(() => {

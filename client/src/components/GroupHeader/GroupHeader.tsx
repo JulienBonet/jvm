@@ -1,11 +1,16 @@
-/* eslint-disable react/prop-types */
 import { Box, Typography } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
-function GroupHeader({ letter, isOpen, onToggle }) {
+interface GroupHeaderProps {
+  letter: string;
+  isOpen: boolean;
+  onToggle: (letter: string) => void;
+}
+
+function GroupHeader({ letter, isOpen, onToggle }: GroupHeaderProps) {
   return (
     <Box
-      onClick={onToggle}
+      onClick={() => onToggle(letter)}
       sx={{
         display: 'flex',
         justifyContent: 'space-between',
