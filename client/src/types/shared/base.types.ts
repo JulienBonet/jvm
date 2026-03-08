@@ -1,3 +1,5 @@
+// client\src\types\shared\base.types.ts
+
 export interface BaseEntity {
   id: number;
   name: string;

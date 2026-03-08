@@ -1,3 +1,4 @@
+// client\src\components\Admin\AdminSnackbar.tsx
 import { Snackbar, Alert } from '@mui/material';
 
 type SnackbarSeverity = 'success' | 'error' | 'warning' | 'info';

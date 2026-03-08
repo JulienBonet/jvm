@@ -1,3 +1,4 @@
+// client\src\hooks\useCrudEntity.ts
 import { useState, useCallback } from 'react';
 
 interface UseCrudEntityParams {

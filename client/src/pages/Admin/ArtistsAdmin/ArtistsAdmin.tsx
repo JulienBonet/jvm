@@ -1,4 +1,4 @@
-/* eslint-disable consistent-return */
+// client\src\pages\Admin\ArtistsAdmin\ArtistsAdmin.tsx
 import { useEffect, useState, useMemo } from 'react';
 import {
   TextField,

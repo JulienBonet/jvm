@@ -1,4 +1,5 @@
 // src/pages/HomeMobile/HomeMobile.tsx
+
 import { useEffect, useMemo, useState } from 'react';
 import './homeMobile.css';
 import {

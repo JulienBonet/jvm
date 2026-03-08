@@ -1,3 +1,4 @@
+// client\src\pages\Home\Home.tsx
 import useIsMobile from '../../hooks/useIsMobile';
 import HomeMobile from './HomeMobile';
 import HomeDesktop from './HomeDesktop';

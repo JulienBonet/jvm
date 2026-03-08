@@ -1,3 +1,4 @@
+// client\src\components\ReleaseCard\ReleaseCard.tsx
 import { Card, CardMedia, CardContent, Typography } from '@mui/material';
 import {Release} from '../../types/entities/release.types'
 

@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+// client\src\components\HomeMobileCompenents\ReleaseDetailDialogMobile\ReleaseDetailDialogMobile.tsx
 import {
   Dialog,
   DialogTitle,

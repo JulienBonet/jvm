@@ -1,3 +1,4 @@
+// client\src\pages\ReleasesByArtist\ReleasesByArtist.tsx
 import { useEffect, useState } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { Button, Typography } from '@mui/material';

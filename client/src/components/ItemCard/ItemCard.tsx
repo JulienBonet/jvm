@@ -1,3 +1,4 @@
+// client\src\components\ItemCard\ItemCard.tsx
 import { Card, CardMedia, CardContent, Typography } from '@mui/material';
 import { BaseEntity } from '../../types/shared/base.types';
 

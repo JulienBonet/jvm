@@ -1,3 +1,4 @@
+// client\src\components\Admin\EntityDetailModal02.tsx
 // > ENTITY DETAIL MODAL : Genre & Style //
 import {
   TextField,
@@ -19,7 +20,7 @@ interface EntityDetailModalProps {
   setOpenDetail: React.Dispatch<React.SetStateAction<boolean>>;
   title: string;
   label: string;
-  editMode: React.Dispatch<React.SetStateAction<boolean>>;
+  editMode: boolean;
   selectedItem: EntityItem | null;
   editedName: string;
   setEditedName: React.Dispatch<React.SetStateAction<string>>;

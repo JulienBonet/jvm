@@ -1,3 +1,4 @@
+// client\src\types\entities\label.types.ts
 import { BaseEntity, BaseEntityForm } from "../shared/base.types"
 
 export interface Label extends BaseEntity {

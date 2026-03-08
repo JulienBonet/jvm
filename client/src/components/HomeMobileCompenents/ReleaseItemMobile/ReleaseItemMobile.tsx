@@ -1,3 +1,4 @@
+// client\src\components\HomeMobileCompenents\ReleaseItemMobile\ReleaseItemMobile.tsx
 import './releaseItemMobile.css';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { ReleaseMobile } from '../../../types/entities/release.types';

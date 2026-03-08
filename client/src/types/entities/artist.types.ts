@@ -1,3 +1,4 @@
+// client\src\types\entities\artist.types.ts
 import { BaseEntity, BaseEntityForm } from "../shared/base.types"
 
 export interface Artist extends BaseEntity {

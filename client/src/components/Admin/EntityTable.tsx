@@ -1,3 +1,4 @@
+// client\src\components\Admin\EntityTable.tsx
 // > ENTITY TABLE : artists & label //
 import {
   Table,

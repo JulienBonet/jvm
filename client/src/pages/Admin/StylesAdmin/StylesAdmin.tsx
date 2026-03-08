@@ -1,3 +1,4 @@
+// client\src\pages\Admin\StylesAdmin\StylesAdmin.tsx
 import { useEffect, useState, useMemo } from 'react';
 import { TextField, Typography, IconButton, CircularProgress, Button, TableCell  } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';

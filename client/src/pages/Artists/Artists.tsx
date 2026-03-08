@@ -1,3 +1,4 @@
+// client\src\pages\Artists\Artists.tsx
 import { useEffect, useState, useRef, useMemo } from 'react';
 import { TextField } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';

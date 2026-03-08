@@ -1,3 +1,4 @@
+// client\src\pages\Admin\GenresAdmin\GenresAdmin.tsx
 import { useEffect, useState, useMemo } from 'react';
 import {
   TextField,

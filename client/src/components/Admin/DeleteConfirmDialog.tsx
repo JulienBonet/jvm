@@ -1,3 +1,4 @@
+// client\src\components\Admin\DeleteConfirmDialog.tsx
 import {
   Dialog,
   DialogTitle,

@@ -1,3 +1,4 @@
+// client\src\types\entities\release.types.ts
 import {Artist} from './artist.types'
 import {Track} from './track.types'
 

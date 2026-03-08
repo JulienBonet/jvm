@@ -1,3 +1,4 @@
+// client\src\hooks\useIsMobile.ts
 import { useEffect, useState } from 'react';
 
 export default function useIsMobile(breakpoint = 1006) {

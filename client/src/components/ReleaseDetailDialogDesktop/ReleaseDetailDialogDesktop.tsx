@@ -1,3 +1,4 @@
+// client\src\components\ReleaseDetailDialogDesktop\ReleaseDetailDialogDesktop.tsx
 import {
   Dialog,
   DialogTitle,

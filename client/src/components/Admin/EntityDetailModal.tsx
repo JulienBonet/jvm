@@ -1,3 +1,4 @@
+// client\src\components\Admin\EntityDetailModal.tsx
 // > ENTITY DETAIL MODAL : artists & label //
 import {
   Dialog,
