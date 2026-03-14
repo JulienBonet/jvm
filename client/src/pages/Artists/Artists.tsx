@@ -21,8 +21,6 @@ function Artists() {
   // -- LOADER STATES -- //
   const [loadingReleases, setLoadingReleases] = useState<boolean>(false);
 
-  console.info('artists', artists);
-
   const backendUrl = `${import.meta.env.VITE_BACKEND_URL}`;
   const cloudinaryUrl = `${import.meta.env.VITE_CLOUDINARY_BASE_URL}`;
 
