@@ -1,3 +1,4 @@
+// server\src\models\genreModels.js
 import { db } from '../../db/connection.js';
 
 /* =========================
@@ -81,7 +82,14 @@ export const editGenreById = async (id, name) => {
 /* =========================
    DELETE
 ========================= */
-export const eraseGenreById = async (id) => {
-  const [result] = await db.query('DELETE FROM genre WHERE id = ?', [id]);
+// export const eraseGenreById = async (id) => {
+//   const [result] = await db.query('DELETE FROM genre WHERE id = ?', [id]);
+//   return result.affectedRows;
+// };
+
+export const eraseGenreById = async (id, connection = null) => {
+  const query = connection ? connection.query.bind(connection) : db.query.bind(db);
+
+  const [result] = await query('DELETE FROM genre WHERE id = ?', [id]);
   return result.affectedRows;
 };

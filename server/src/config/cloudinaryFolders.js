@@ -1,3 +1,4 @@
+// server\src\config\cloudinaryFolders.js
 export const CLOUDINARY_FOLDERS = {
   ARTIST: 'jvm/artists',
   LABEL: 'jvm/labels',

@@ -1,5 +1,8 @@
 import { db } from '../../db/connection.js';
 
+/* =========================
+   GET
+========================= */
 export const findAllReleases = async () => {
   const [rows] = await db.query(`
     SELECT 

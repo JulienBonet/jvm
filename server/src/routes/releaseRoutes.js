@@ -9,5 +9,6 @@ router.get('/', releaseControllers.getAllReleases);
 router.post('/', upload.single('file'), releaseControllers.createRelease);
 router.get('/:id', releaseControllers.getReleaseById);
 router.get('/discogs/:id', releaseControllers.fetchDiscogsRelease);
+router.delete('/:id', releaseControllers.deleteRelease);
 
 export default router;

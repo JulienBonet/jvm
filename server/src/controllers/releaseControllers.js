@@ -4,6 +4,7 @@ import * as releaseCreateModels from '../models/releaseCreateModels.js';
 import { uploadBufferToCloudinary, deleteFromCloudinary } from '../utils/cloudinary.js';
 import { CLOUDINARY_FOLDERS } from '../config/cloudinaryFolders.js';
 import { parseJSON } from '../utils/parsePayload.js';
+import { eraseRelease } from '../models/releaseDeleteModels.js';
 
 export const getAllReleases = async (req, res, next) => {
   try {
@@ -137,6 +138,30 @@ export const fetchDiscogsRelease = async (req, res) => {
     res.status(500).json({
       message: 'Discogs fetch failed',
       details: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+};
+
+/* =========================
+   DELETE
+========================= */
+
+export const deleteRelease = async (req, res) => {
+  try {
+    const releaseId = Number(req.params.id);
+
+    if (!releaseId) {
+      return res.status(400).json({ error: 'Invalid release id' });
+    }
+
+    await eraseRelease(releaseId);
+
+    res.status(200).json({ message: 'Release deleted successfully' });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: 'Erreur suppression release',
     });
   }
 };

@@ -6,7 +6,6 @@ import {
   IconButton,
   CircularProgress,
   Button,
-  Avatar,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
@@ -45,7 +44,9 @@ function ReleasesAdmin() {
   // --  DELETE STATES --//
 
   const [releaseToDelete, setReleaseToDelete] = useState<Release | null>(null);
-  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
+
+  console.info('releaseToDelete', releaseToDelete)
 
   // --  FETCHING EXTERNES STATES --//
   const [fetchingDiscogs, setFetchingDiscogs] = useState(false);
@@ -131,6 +132,33 @@ function ReleasesAdmin() {
     setOpenCreate(false);
 
     showSnackbar('Release créée avec succès', 'success');
+  };
+
+  // ---------------------------
+  //  DELETE
+  // ---------------------------
+
+  const handleDeleteConfirmed = async () => {
+    if (!releaseToDelete) return;
+
+    try {
+      console.info('start handleDeleteConfirmed')
+      const res = await fetch(`${backendUrl}/api/release/${releaseToDelete.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) throw new Error('Erreur suppression');
+
+      await fetchReleases();
+
+      showSnackbar('Release supprimée', 'success');
+
+      setConfirmOpen(false);
+      setReleaseToDelete(null);
+    } catch (err) {
+      console.error(err);
+      showSnackbar('Erreur delete release', 'error');
+    }
   };
 
   // ---------------------------
@@ -260,9 +288,8 @@ function ReleasesAdmin() {
           console.info('Release select on view btn:', release);
         }}
         onDelete={(release: Release) => {
-          //   setArtistToDelete(artist);
-          //   setConfirmOpen(true);
-          console.info('Release select on delete btn:', release);
+          setReleaseToDelete(release);
+          setConfirmOpen(true);
         }}
       />
 
@@ -283,13 +310,13 @@ function ReleasesAdmin() {
         onSnackbar={showSnackbar}
       />
 
-      {/* <DeleteConfirmDialog
+      <DeleteConfirmDialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
         onConfirm={handleDeleteConfirmed}
-        entityName={artistToDelete?.name}
-        label="l’artiste"
-      /> */}
+        entityName={releaseToDelete?.title}
+        label="la release"
+      />
 
       <AdminSnackbar snackbar={snackbar} setSnackbar={setSnackbar} />
     </main>

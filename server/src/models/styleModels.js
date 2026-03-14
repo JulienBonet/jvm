@@ -1,3 +1,4 @@
+// server\src\models\styleModels.js
 import { db } from '../../db/connection.js';
 
 /* =========================
@@ -82,7 +83,14 @@ export const editStyleById = async (id, name) => {
 /* =========================
    DELETE
 ========================= */
-export const eraseStyleById = async (id) => {
-  const [result] = await db.query('DELETE FROM style WHERE id = ?', [id]);
+// export const eraseStyleById = async (id) => {
+//   const [result] = await db.query('DELETE FROM style WHERE id = ?', [id]);
+//   return result.affectedRows;
+// };
+
+export const eraseStyleById = async (id, connection = null) => {
+  const query = connection ? connection.query.bind(connection) : db.query.bind(db);
+
+  const [result] = await query('DELETE FROM style WHERE id = ?', [id]);
   return result.affectedRows;
 };

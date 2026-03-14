@@ -1,3 +1,4 @@
+// server\src\models\artistModels.js
 import { db } from '../../db/connection.js';
 import cloudinary from 'cloudinary';
 
@@ -272,24 +273,48 @@ export const getArtistImage = async (connection, artistId) => {
    DELETE
 ================================= */
 
-export const eraseArtist = async (id) => {
+// export const eraseArtist = async (id) => {
+//   // 1. récupérer l'image
+//   const [rows] = await db.query(
+//     `SELECT url FROM image WHERE entity_type='artist' AND entity_id=?`,
+//     [id],
+//   );
+//   const imageUrl = rows[0]?.url;
+
+//   // 2. si ce n'est pas la default, supprimer de Cloudinary
+//   if (imageUrl && imageUrl !== '00_artist_default') {
+//     // Extraire le public_id pour Cloudinary
+//     const publicId = imageUrl.split('/').pop().split('.')[0]; // si URL complète
+//     await cloudinary.v2.uploader.destroy(`jvm/artists/${publicId}`);
+//   }
+
+//   // 3. supprimer l’entrée dans image
+//   await db.query(`DELETE FROM image WHERE entity_type='artist' AND entity_id=?`, [id]);
+
+//   // 4. supprimer l’artiste
+//   await db.query(`DELETE FROM artist WHERE id=?`, [id]);
+// };
+
+export const eraseArtist = async (id, connection = null) => {
+  const query = connection ? connection.query.bind(connection) : db.query.bind(db);
+
   // 1. récupérer l'image
-  const [rows] = await db.query(
-    `SELECT url FROM image WHERE entity_type='artist' AND entity_id=?`,
-    [id],
-  );
+  const [rows] = await query(`SELECT url FROM image WHERE entity_type='artist' AND entity_id=?`, [
+    id,
+  ]);
+
   const imageUrl = rows[0]?.url;
 
-  // 2. si ce n'est pas la default, supprimer de Cloudinary
+  // 2. supprimer cloudinary si pas default
   if (imageUrl && imageUrl !== '00_artist_default') {
-    // Extraire le public_id pour Cloudinary
-    const publicId = imageUrl.split('/').pop().split('.')[0]; // si URL complète
+    const publicId = imageUrl.split('/').pop().split('.')[0];
+
     await cloudinary.v2.uploader.destroy(`jvm/artists/${publicId}`);
   }
 
-  // 3. supprimer l’entrée dans image
-  await db.query(`DELETE FROM image WHERE entity_type='artist' AND entity_id=?`, [id]);
+  // 3. supprimer image
+  await query(`DELETE FROM image WHERE entity_type='artist' AND entity_id=?`, [id]);
 
-  // 4. supprimer l’artiste
-  await db.query(`DELETE FROM artist WHERE id=?`, [id]);
+  // 4. supprimer artiste
+  await query(`DELETE FROM artist WHERE id=?`, [id]);
 };
