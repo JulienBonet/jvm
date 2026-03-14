@@ -298,6 +298,24 @@ export const getArtistImage = async (connection, artistId) => {
 export const eraseArtist = async (id, connection = null) => {
   const query = connection ? connection.query.bind(connection) : db.query.bind(db);
 
+  // 0. Vérifier si l'artiste est utilisé
+  const [blockingReleases] = await query(
+    `SELECT r.title, r.year
+     FROM releases r
+     JOIN release_artist ra ON ra.release_id = r.id
+     WHERE ra.artist_id = ?`,
+    [id],
+  );
+
+  if (blockingReleases.length > 0) {
+    // construire un message lisible
+    const titles = blockingReleases.map((r) => `${r.title} (${r.year})`).join(', ');
+    const message = `Impossible de supprimer : artiste utilisé par ces releases : ${titles}`;
+    const error = new Error(message);
+    error.code = 'ENTITY_IN_USE';
+    throw error;
+  }
+
   // 1. récupérer l'image
   const [rows] = await query(`SELECT url FROM image WHERE entity_type='artist' AND entity_id=?`, [
     id,

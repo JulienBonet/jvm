@@ -6,10 +6,7 @@ interface UseCrudEntityParams {
   baseEndpoint: string;
 }
 
-function useCrudEntity<T>({
-  listEndpoint,
-  baseEndpoint,
-}: UseCrudEntityParams) {
+function useCrudEntity<T>({ listEndpoint, baseEndpoint }: UseCrudEntityParams) {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const [data, setData] = useState<T[]>([]);
@@ -80,7 +77,12 @@ function useCrudEntity<T>({
       method: 'DELETE',
     });
 
-    if (!res.ok) throw new Error('Erreur suppression');
+    // if (!res.ok) throw new Error('Erreur suppression');
+    
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error || 'Erreur suppression');
+    }
 
     await fetchAll();
   };

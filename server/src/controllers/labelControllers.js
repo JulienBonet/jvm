@@ -225,7 +225,12 @@ export const deleteLabel = async (req, res) => {
     res.json({ message: 'Label deleted' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Erreur suppression' });
+
+    if (error.code === 'ENTITY_IN_USE') {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: 'Erreur suppression' });
+    }
   }
 };
 /* ===============================
