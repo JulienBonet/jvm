@@ -276,7 +276,7 @@ export const getArtistImage = async (connection, artistId) => {
 export const eraseArtist = async (id, connection = null) => {
   const query = connection ? connection.query.bind(connection) : db.query.bind(db);
 
-  // 0. Vérifier si l'artiste est utilisé
+  // 0. Vérifier si l'artiste est utilisé par une release
   const [blockingReleases] = await query(
     `SELECT r.title, r.year
      FROM releases r
