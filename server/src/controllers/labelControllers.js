@@ -27,6 +27,7 @@ export const getAllReleasesByLabelId = async (req, res) => {
     res.status(500).json({ error: 'Erreur serveur' });
   }
 };
+
 export const getAllLabelsAdmin = async (req, res) => {
   try {
     const labels = await labelModels.findAllLabelsForAdmin();
@@ -129,6 +130,7 @@ export const createLabel = async (req, res) => {
     connection.release();
   }
 };
+
 /* =========================
    UPDATE
 ========================= */
@@ -187,6 +189,8 @@ export const updateLabel = async (req, res) => {
 
     await connection.commit();
 
+    const updatedLabel = await labelModels.findLabelByIdTransactional(connection, labelId);
+
     // 5️⃣ Supprimer ancienne image si remplacée
     if (uploadedFilename && currentImage && currentImage !== '00_label_default') {
       await deleteFromCloudinary({
@@ -195,10 +199,7 @@ export const updateLabel = async (req, res) => {
       });
     }
 
-    res.json({
-      message: 'label updated',
-      image_filename: finalImage,
-    });
+    res.json(updatedLabel);
   } catch (error) {
     await connection.rollback();
 
@@ -233,6 +234,7 @@ export const deleteLabel = async (req, res) => {
     }
   }
 };
+
 /* ===============================
   DISCOGS
 ================================= */
@@ -254,7 +256,7 @@ export const previewLabelFromDiscogs = async (req, res) => {
 
     if (!response.ok) {
       console.log('Discogs non trouvé');
-      return res.status(404).json({ error: 'Artiste introuvable sur Discogs' });
+      return res.status(404).json({ error: 'Label introuvable sur Discogs' });
     }
 
     const data = await response.json();

@@ -64,6 +64,27 @@ export const findAllReleasesByLabelId = async (labelId) => {
   return rows;
 };
 
+export const findLabelByIdTransactional = async (connection, id) => {
+  const [rows] = await connection.query(
+    `
+    SELECT
+      l.id,
+      l.name,
+      l.sorted_name,
+      l.discogs_id,
+      i.url AS image_url
+    FROM label l
+    LEFT JOIN image i
+      ON i.entity_type = 'label'
+     AND i.entity_id = l.id
+    WHERE l.id = ?;
+    `,
+    [id],
+  );
+
+  return rows[0] || null;
+};
+
 export const findAllLabelsForAdmin = async () => {
   const [rows] = await db.query(`
     SELECT
@@ -167,6 +188,7 @@ export const findLabelByName = async (connection, name) => {
 
   return rows[0] || null;
 };
+
 /* ===============================
    UPDATE
 ================================= */
@@ -210,6 +232,7 @@ export const updateLabelTransactional = async ({
     );
   }
 };
+
 export const getLabelImage = async (connection, labelId) => {
   const [rows] = await connection.query(
     `SELECT url
@@ -221,6 +244,7 @@ export const getLabelImage = async (connection, labelId) => {
 
   return rows[0]?.url || '00_label_default';
 };
+
 /* ===============================
    DELETE
 ================================= */

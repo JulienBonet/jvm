@@ -1,3 +1,4 @@
+// server\src\controllers\releaseControllers.js
 import { db } from '../../db/connection.js';
 import * as releaseModels from '../models/releaseModels.js';
 import * as releaseCreateModels from '../models/releaseCreateModels.js';
@@ -5,6 +6,7 @@ import { uploadBufferToCloudinary, deleteFromCloudinary } from '../utils/cloudin
 import { CLOUDINARY_FOLDERS } from '../config/cloudinaryFolders.js';
 import { parseJSON } from '../utils/parsePayload.js';
 import { eraseRelease } from '../models/releaseDeleteModels.js';
+import { mapDiscogsRelease } from '../services/discogsMapper.js';
 
 export const getAllReleases = async (req, res, next) => {
   try {
@@ -132,7 +134,10 @@ export const fetchDiscogsRelease = async (req, res) => {
 
     const data = await response.json();
 
-    res.json(data);
+    // res.json(data);
+    const mapped = mapDiscogsRelease(data);
+
+    res.json(mapped);
   } catch (error) {
     console.error(error);
     res.status(500).json({

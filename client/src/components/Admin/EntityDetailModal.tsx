@@ -38,7 +38,7 @@ function EntityDetailModal<T extends BaseEntity>({
     entity,
     setEntity,
     editMode,
-    setEditMode,
+    // setEditMode,
     onStartEdit,
     onCancelEdit,
     onSave,

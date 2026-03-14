@@ -49,8 +49,6 @@ function ReleaseDetailDialogDesktop({
     return acc;
   }, {});
 
-  console.info('releaseDetail', releaseDetail);
-
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle sx={{ height: '20px' }}>

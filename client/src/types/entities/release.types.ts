@@ -1,6 +1,6 @@
 // client\src\types\entities\release.types.ts
-import {Artist} from './artist.types'
-import {Track} from './track.types'
+import { Artist } from './artist.types';
+import { Track } from './track.types';
 
 export interface Release {
   id: number;
@@ -22,22 +22,22 @@ export interface Release {
 }
 
 export interface Genre {
-  id: number
-  name: string
+  id: number;
+  name: string;
 }
 
 export interface Style {
-  id: number
-  name: string
+  id: number;
+  name: string;
 }
 
 export interface ReleaseLink {
-  platform: string
-  url: string
+  platform: string;
+  url: string;
 }
 
 export interface ReleaseDetail extends Release {
-  links?: ReleaseLink[]
+  links?: ReleaseLink[];
 }
 
 export interface ReleaseMobile {
@@ -70,9 +70,9 @@ export interface ReleaseMDetail {
 
   cover?: { image_url: string }[];
 
-  tracks?: Track[]
+  tracks?: Track[];
 
-  links?: ReleaseLink[]
+  links?: ReleaseLink[];
 }
 
 // create realease
@@ -107,11 +107,13 @@ export interface DiscogsIdentifier {
 export interface DiscogsArtist {
   name: string;
   id: number;
+  thumbnail_url?: string;
 }
 
 export interface DiscogsLabel {
   name: string;
   id: number;
+  thumbnail_url?: string;
 }
 
 export interface DiscogsFormat {

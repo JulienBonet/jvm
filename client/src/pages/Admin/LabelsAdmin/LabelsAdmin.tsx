@@ -63,6 +63,9 @@ function LabelsAdmin() {
   const [previewEditImage, setPreviewEditImage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
+  console.info('originalLabel', originalLabel)
+  console.info('editedLabel', editedLabel)
+
   // --  DELETE STATES --//
 
   const [labelToDelete, setLabelToDelete] = useState<Label | null>(null);
@@ -136,7 +139,7 @@ function LabelsAdmin() {
     try {
       setFetchingDiscogs(true);
 
-      const res = await fetch(`${backendUrl}/api/artist/discogs-preview/${editedLabel.discogs_id}`);
+      const res = await fetch(`${backendUrl}/api/label/discogs-preview/${editedLabel.discogs_id}`);
       if (!res.ok) throw new Error('Erreur Discogs');
 
       const discogsData = await res.json();
@@ -302,11 +305,11 @@ function LabelsAdmin() {
 
   const getEditLabelImageSrc = () => {
     if (previewEditImage) return previewEditImage;
+    if (editedLabel?.discogs_image_url) return editedLabel.discogs_image_url;
     if (!editedLabel?.image_url) return `${cloudinaryUrl}/jvm/labels/00_label_default`;
     if (editedLabel.image_url.startsWith('http')) return editedLabel.image_url;
     return `${cloudinaryUrl}/jvm/labels/${editedLabel.image_url}?t=${Date.now()}`;
   };
-
   // ---------------------------
   //  RENDER
   // ---------------------------
@@ -366,13 +369,21 @@ function LabelsAdmin() {
         onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
         renderRow={(label) => (
           <>
-            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align='center'>{label.id}</TableCell>
+            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align="center">
+              {label.id}
+            </TableCell>
             <TableCell sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Avatar src={`${cloudinaryUrl}/jvm/labels/${label.image_url}`} />
             </TableCell>
-            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align='center'>{label.name}</TableCell>
-            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align='center'>{label.sorted_name}</TableCell>
-            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align='center'>{label.release_count}</TableCell>
+            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align="center">
+              {label.name}
+            </TableCell>
+            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align="center">
+              {label.sorted_name}
+            </TableCell>
+            <TableCell sx={{ fontFamily: 'var(--font-02)', fontSize: 'medium' }} align="center">
+              {label.release_count}
+            </TableCell>
           </>
         )}
         onView={(label) => {

@@ -46,8 +46,6 @@ function ReleasesAdmin() {
   const [releaseToDelete, setReleaseToDelete] = useState<Release | null>(null);
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
 
-  console.info('releaseToDelete', releaseToDelete)
-
   // --  FETCHING EXTERNES STATES --//
   const [fetchingDiscogs, setFetchingDiscogs] = useState(false);
 

@@ -74,6 +74,10 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
   const [discogsLink, setDiscogLink] = useState<string>('');
   const [youtubeLink, setYoutubeLink] = useState<string>('');
 
+  console.info('release', release);
+  console.info('artists', artists);
+  console.info('labels', labels);
+
   // -----------------------
   //  RESET FUNCTION
   // -----------------------
@@ -107,6 +111,15 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
 
     setCoverFile(null);
     setCoverPreview(`${cloudinaryUrl}/${DEFAULT_COVER}`);
+  };
+
+  // -----------------------
+  //  CLOSE FUNCTION
+  // -----------------------
+
+  const handeClose = () => {
+    resetForm();
+    onClose();
   };
 
   // -----------------------
@@ -173,7 +186,6 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
   // -----------------------
 
   const populateRelease = (data: DiscogsRelease) => {
-    // release
     const barcode = data.identifiers?.find((id) => id.type === 'Barcode')?.value ?? '';
 
     const releaseType =
@@ -192,14 +204,23 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
     // artists
     const uniqueArtists = [
       ...new Map(
-        (data.artists ?? []).map((a) => [a.id, { name: a.name, discogs_id: a.id }]),
+        (data.artists ?? []).map((a) => [
+          a.id,
+          { name: a.name, discogs_id: a.id, thumbnail_url: a.thumbnail_url ?? null },
+        ]),
       ).values(),
     ];
 
     setArtists(uniqueArtists);
 
     // labels
-    setLabels(data.labels?.map((l) => ({ name: l.name, discogs_id: l.id })) ?? []);
+    setLabels(
+      data.labels?.map((l) => ({
+        name: l.name,
+        discogs_id: l.id,
+        thumbnail_url: l.thumbnail_url ?? null,
+      })) ?? [],
+    );
 
     // genres
     setGenres(data.genres?.map((g) => ({ name: g })) ?? []);
@@ -213,6 +234,7 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
       data.formats?.[0]?.descriptions
         ?.find((d) => ['7"', '10"', '12"'].includes(d))
         ?.replace('"', '') ?? '';
+
     const speed =
       data.formats?.[0]?.descriptions?.find((d) => d.includes('RPM'))?.replace(' RPM', '') ?? '';
 
@@ -226,7 +248,10 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
     setTracks(data.tracklist ?? []);
 
     // cover
-    setRelease((prev) => ({ ...prev, discogs_image_url: data.images?.[0]?.uri ?? '' }));
+    setRelease((prev) => ({
+      ...prev,
+      discogs_image_url: data.images?.[0]?.uri ?? '',
+    }));
   };
 
   const handleDiscogsFetch = async (): Promise<void> => {
@@ -299,6 +324,10 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
 
       console.log('formData envoyé :', {
         releasePayload,
+        artists,
+        labels,
+        genres,
+        styles,
         tracks,
         coverFile,
         disc,
@@ -362,7 +391,7 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
           }}
         >
           Create Release
-          <IconButton onClick={onClose}>
+          <IconButton onClick={handeClose}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>

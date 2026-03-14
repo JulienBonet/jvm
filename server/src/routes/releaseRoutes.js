@@ -1,3 +1,4 @@
+// server\src\routes\releaseRoutes.js
 import { Router } from 'express';
 import multer from 'multer';
 import * as releaseControllers from '../controllers/releaseControllers.js';
