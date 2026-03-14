@@ -39,8 +39,6 @@ function HomeDesktop() {
   // -- LOADER STATES -- //
   const [loadingReleases, setLoadingReleases] = useState<boolean>(true);
 
-  console.info('releases', releases);
-
   const backendUrl = `${import.meta.env.VITE_BACKEND_URL}`;
   const cloudinaryUrl = `${import.meta.env.VITE_CLOUDINARY_BASE_URL}`;
 
