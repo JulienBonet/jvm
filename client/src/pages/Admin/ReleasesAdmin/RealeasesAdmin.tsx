@@ -118,6 +118,16 @@ function ReleasesAdmin() {
     }
   };
 
+  const handleReleaseUpdated = async () => {
+    // 1️⃣ refetch liste globale
+    await fetchReleases();
+
+    // 2️⃣ refetch détail de la release ouverte
+    if (selectedRelease?.id) {
+      await fetchSelectedRelease(selectedRelease.id);
+    }
+  };
+
   // ---------------------------
   //  CREATE
   // ---------------------------
@@ -297,6 +307,7 @@ function ReleasesAdmin() {
         imageBaseUrl={`${cloudinaryUrl}/jvm/releases`}
         discogsLink={discogsLink}
         youtubeLink={youtubeLink}
+        onUpdated={handleReleaseUpdated}
       />
 
       <CreateRelease

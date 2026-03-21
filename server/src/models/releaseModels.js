@@ -1,3 +1,4 @@
+// server\src\models\releaseModels.js
 import { db } from '../../db/connection.js';
 
 /* =========================
@@ -139,4 +140,68 @@ export const findReleaseById = async (releaseId) => {
     tracks,
     links,
   };
+};
+
+/* =========================
+   UPDATE
+========================= */
+export const deleteReleaseRelations = async (releaseId, conn) => {
+  // tracks → side → disc
+  await conn.query(
+    `
+    DELETE t FROM track t
+    JOIN side s ON t.side_id = s.id
+    JOIN disc d ON s.disc_id = d.id
+    WHERE d.release_id = ?
+  `,
+    [releaseId],
+  );
+
+  await conn.query(
+    `
+    DELETE s FROM side s
+    JOIN disc d ON s.disc_id = d.id
+    WHERE d.release_id = ?
+  `,
+    [releaseId],
+  );
+
+  await conn.query(`DELETE FROM disc WHERE release_id = ?`, [releaseId]);
+
+  await conn.query(`DELETE FROM release_artist WHERE release_id = ?`, [releaseId]);
+  await conn.query(`DELETE FROM release_label WHERE release_id = ?`, [releaseId]);
+  await conn.query(`DELETE FROM release_genre WHERE release_id = ?`, [releaseId]);
+  await conn.query(`DELETE FROM release_style WHERE release_id = ?`, [releaseId]);
+
+  await conn.query(
+    `
+    DELETE FROM external_link 
+    WHERE entity_type='release' AND entity_id=?
+  `,
+    [releaseId],
+  );
+
+  await conn.query(
+    `
+    DELETE FROM image 
+    WHERE entity_type='release' AND entity_id=?
+  `,
+    [releaseId],
+  );
+};
+
+export const updateReleaseMain = async (id, release, conn) => {
+  const fields = [];
+  const values = [];
+
+  for (const key of ['title', 'year', 'country', 'barcode', 'notes', 'release_type']) {
+    if (release[key] !== undefined && release[key] !== null) {
+      fields.push(`${key}=?`);
+      values.push(release[key]);
+    }
+  }
+
+  if (fields.length === 0) return;
+
+  await conn.query(`UPDATE releases SET ${fields.join(', ')} WHERE id=?`, [...values, id]);
 };

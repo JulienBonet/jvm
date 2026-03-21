@@ -183,6 +183,28 @@ function HomeDesktop() {
     setSelectedReleaseId(null);
   };
 
+  const handleReleaseUpdated = async () => {
+    // 🔹 Refetch du détail si une release est ouverte
+    if (selectedReleaseId !== null) {
+      setLoadingDetail(true);
+      try {
+        const res = await fetch(`${backendUrl}/api/release/${selectedReleaseId}`);
+        if (!res.ok) throw new Error('Erreur serveur');
+        const data: ReleaseMDetail = await res.json();
+        setReleaseDetail(data); // 🔥 met à jour le modal avec les nouvelles infos
+      } catch (err) {
+        console.error('Erreur refetch release detail:', err);
+      } finally {
+        setLoadingDetail(false);
+      }
+    }
+
+    // 🔹 Refetch de la liste complète pour que le listing soit à jour
+    await fetchReleases();
+    await fetchGenres();
+    await fetchStyles();
+  };
+
   /* =======================
     BUTTONS HELPER
   ======================= */
@@ -359,6 +381,7 @@ function HomeDesktop() {
         imageBaseUrl={`${cloudinaryUrl}/jvm/releases`}
         discogsLink={discogsLink}
         youtubeLink={youtubeLink}
+        onUpdated={handleReleaseUpdated}
       />
       {/* END MODAL */}
     </div>

@@ -1,3 +1,4 @@
+// server\src\models\releaseDeleteModels.js
 import { db } from '../../db/connection.js';
 import { deleteFromCloudinary } from '../utils/cloudinary.js';
 import { CLOUDINARY_FOLDERS } from '../config/cloudinaryFolders.js';

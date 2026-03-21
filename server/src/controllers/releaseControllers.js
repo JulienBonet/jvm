@@ -148,6 +148,119 @@ export const fetchDiscogsRelease = async (req, res) => {
 };
 
 /* =========================
+   UPDATE
+========================= */
+export const updateRelease = async (req, res) => {
+  const connection = await db.getConnection();
+  let uploadedFilename = null;
+
+  try {
+    const { id } = req.params;
+    const file = req.file;
+
+    const payload = {
+      release: {
+        ...parseJSON(req.body.release, {}), // si release JSON existe
+        ...(req.body.title ? { title: req.body.title } : {}),
+        ...(req.body.year ? { year: parseInt(req.body.year, 10) } : {}),
+        ...(req.body.country ? { country: req.body.country } : {}),
+        // etc.
+      },
+      artists: parseJSON(req.body.artists, []),
+      labels: parseJSON(req.body.labels, []),
+      genres: parseJSON(req.body.genres, []),
+      styles: parseJSON(req.body.styles, []),
+      links: parseJSON(req.body.links, []),
+      tracks: parseJSON(req.body.tracks, []),
+      disc: parseJSON(req.body.disc, {}),
+    };
+
+    console.info('payload', payload);
+
+    await connection.beginTransaction();
+
+    // 🧠 1. READ EXISTING IMAGE
+    const [existingImages] = await connection.query(
+      `SELECT url FROM image 
+       WHERE entity_type='release' AND entity_id=?`,
+      [id],
+    );
+
+    const oldFilename = existingImages[0]?.url || null;
+
+    // 🧨 2. DELETE EXISTING DATA (DB ONLY)
+    await releaseModels.deleteReleaseRelations(id, connection);
+
+    // 🖼️ 3. IMAGE LOGIC
+    let finalImage = oldFilename;
+
+    if (file) {
+      uploadedFilename = await uploadBufferToCloudinary({
+        buffer: file.buffer,
+        folder: CLOUDINARY_FOLDERS.RELEASE,
+        prefix: 'release',
+      });
+
+      finalImage = uploadedFilename;
+
+      if (oldFilename) {
+        await deleteFromCloudinary({
+          folder: CLOUDINARY_FOLDERS.RELEASE,
+          filename: oldFilename,
+        });
+      }
+    } else if (payload.release.discogs_image_url) {
+      const response = await fetch(payload.release.discogs_image_url);
+      const buffer = Buffer.from(await response.arrayBuffer());
+
+      uploadedFilename = await uploadBufferToCloudinary({
+        buffer,
+        folder: CLOUDINARY_FOLDERS.RELEASE,
+        prefix: 'release',
+      });
+
+      finalImage = uploadedFilename;
+
+      if (oldFilename) {
+        await deleteFromCloudinary({
+          folder: CLOUDINARY_FOLDERS.RELEASE,
+          filename: oldFilename,
+        });
+      }
+    }
+
+    // 🧠 inject
+    payload.image_filename = finalImage;
+    payload.thumbnail_url = payload.release.discogs_image_url || null;
+
+    // 🧱 4. UPDATE MAIN
+    await releaseModels.updateReleaseMain(id, payload.release, connection);
+
+    // 🧩 5. REINSERT RELATIONS
+    await releaseCreateModels.insertReleaseRelations(id, payload, connection);
+
+    await connection.commit();
+
+    res.status(200).json({ id });
+  } catch (error) {
+    await connection.rollback();
+
+    // rollback cloudinary si upload échoue
+    if (uploadedFilename) {
+      await deleteFromCloudinary({
+        folder: CLOUDINARY_FOLDERS.RELEASE,
+        filename: uploadedFilename,
+      });
+    }
+
+    console.error(error);
+    res.status(500).json({ message: 'Update failed' });
+  } finally {
+    connection.release();
+  }
+};
+
+/* =========================
    DELETE
 ========================= */
 

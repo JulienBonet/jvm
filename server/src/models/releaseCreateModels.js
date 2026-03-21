@@ -243,3 +243,183 @@ export const addRelease = async (payload, connection) => {
     conn.release();
   }
 };
+
+export const insertReleaseRelations = async (releaseId, payload, connection) => {
+  const conn = connection;
+
+  const { image_filename, thumbnail_url, artists, labels, genres, styles, links, tracks, disc } =
+    payload;
+
+  // -----------------
+  // image
+  // -----------------
+  if (image_filename) {
+    await conn.query(
+      `INSERT INTO image (entity_type, entity_id, type, url, thumbnail_url)
+       VALUES ('release', ?, 'cover', ?, ?)`,
+      [releaseId, image_filename, thumbnail_url || null],
+    );
+  }
+
+  // -----------------
+  // artist
+  // -----------------
+  const insertedArtists = new Set();
+
+  for (const artist of artists || []) {
+    const artistId = await getOrCreateArtist(conn, artist);
+    const role = artist.role || 'Main';
+    const key = `${artistId}-${role}`;
+
+    if (insertedArtists.has(key)) continue;
+    insertedArtists.add(key);
+
+    await conn.query(
+      `INSERT INTO release_artist (release_id, artist_id, role)
+       VALUES (?, ?, ?)`,
+      [releaseId, artistId, role],
+    );
+  }
+
+  // -----------------
+  // Label
+  // -----------------
+  for (const label of labels || []) {
+    const labelId = await getOrCreateLabel(conn, label);
+
+    await conn.query(
+      `INSERT INTO release_label (release_id, label_id, catalog_number)
+       VALUES (?, ?, ?)`,
+      [releaseId, labelId, label.catalog_number || null],
+    );
+  }
+
+  // -----------------
+  // genre
+  // -----------------
+
+  for (const genre of genres || []) {
+    let genreId = genre.id;
+
+    if (!genreId) {
+      const [existing] = await conn.query(`SELECT id FROM genre WHERE name = ?`, [genre.name]);
+
+      if (existing.length) genreId = existing[0].id;
+      else {
+        const [created] = await conn.query(`INSERT INTO genre (name) VALUES (?)`, [genre.name]);
+        genreId = created.insertId;
+      }
+    }
+
+    await conn.query(
+      `
+    INSERT INTO release_genre (release_id, genre_id)
+    VALUES (?, ?)
+  `,
+      [releaseId, genreId],
+    );
+  }
+
+  // -----------------
+  // style
+  // -----------------
+
+  for (const style of styles || []) {
+    let styleId = style.id;
+
+    if (!styleId) {
+      const [existing] = await conn.query(`SELECT id FROM style WHERE name = ?`, [style.name]);
+
+      if (existing.length) styleId = existing[0].id;
+      else {
+        const [created] = await conn.query(`INSERT INTO style (name) VALUES (?)`, [style.name]);
+        styleId = created.insertId;
+      }
+    }
+
+    await conn.query(
+      `
+    INSERT INTO release_style (release_id, style_id)
+    VALUES (?, ?)
+  `,
+      [releaseId, styleId],
+    );
+  }
+
+  // -----------------
+  // link
+  // -----------------
+  for (const link of links || []) {
+    if (!link.platform || !link.url) continue;
+
+    await conn.query(
+      `INSERT INTO external_link (entity_type, entity_id, platform, url)
+       VALUES ('release', ?, ?, ?)`,
+      [releaseId, link.platform, link.url],
+    );
+  }
+
+  // -----------------
+  // tracks
+  // -----------------
+  if (tracks?.length) {
+    const discCache = {};
+    const sideCache = {};
+
+    for (const track of tracks) {
+      if (track.type_ && track.type_ !== 'track') continue;
+
+      const parsed = parseTrackPosition(track.position);
+      if (!parsed) continue; // skip invalid positions
+
+      const { disc: discNumber, side } = parsed;
+      if (!side || !discNumber) continue;
+
+      // ---------- DISC ----------
+      let discId = discCache[discNumber];
+
+      if (!discId) {
+        const [discResult] = await conn.query(
+          `INSERT INTO disc (release_id, disc_number, format, size, speed)
+         VALUES (?, ?, ?, ?, ?)`,
+          [
+            releaseId,
+            discNumber,
+            disc?.format || payload.disc?.format || null,
+            disc?.size || payload.disc?.size || null,
+            disc?.speed
+              ? parseInt(disc.speed)
+              : payload.disc?.speed
+                ? parseInt(payload.disc.speed)
+                : null,
+          ],
+        );
+        discId = discResult.insertId;
+        discCache[discNumber] = discId;
+      }
+
+      // ---------- SIDE ----------
+      const sideKey = `${discId}-${side}`;
+      let sideId = sideCache[sideKey];
+
+      if (!sideId) {
+        const [sideResult] = await conn.query(
+          `INSERT INTO side (disc_id, name)
+         VALUES (?, ?)`,
+          [discId, side],
+        );
+        sideId = sideResult.insertId;
+        sideCache[sideKey] = sideId;
+      }
+
+      // ---------- TRACK ----------
+      await conn.query(
+        `INSERT INTO track (side_id, position, title, duration)
+       VALUES (?, ?, ?, ?)`,
+        [sideId, track.position || null, track.title || null, track.duration || null],
+      );
+    }
+  }
+
+  return { id: releaseId };
+};

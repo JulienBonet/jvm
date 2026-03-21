@@ -1,0 +1,219 @@
+// client\src\components\ReleaseDetailDialogDesktop\ReleaseDetailView.tsx
+import { Typography, CircularProgress, Divider, IconButton, Box, Button } from '@mui/material';
+import DiscogsLogo from '../../assets/images/Discogs.png';
+import YoutubeLogo from '../../assets/images/youtube.png';
+import './releaseDetailDialogDesktop.css';
+import { ReleaseMDetail } from '../../types/entities/release.types';
+import { Track } from '../../types/entities/track.types';
+
+interface ReleaseDetailViewProps {
+  releaseDetail: ReleaseMDetail | null;
+  loadingDetail: boolean;
+  imageBaseUrl: string;
+  discogsLink?: string;
+  youtubeLink?: string;
+  tracks?: Track[];
+  onEdit: () => void;
+}
+
+function ReleaseDetailView({
+  releaseDetail,
+  loadingDetail,
+  imageBaseUrl,
+  discogsLink,
+  youtubeLink,
+  onEdit,
+}: ReleaseDetailViewProps) {
+  if (!releaseDetail) return null;
+  const firstTrack = releaseDetail.tracks?.[0];
+
+  // variable pour les blocs disc - track de la release //
+  const groupedTracks = releaseDetail.tracks?.reduce<Record<number, Track[]>>((acc, track) => {
+    const disc = track.disc_number;
+
+    acc[disc] ??= []; // initialise si undefined
+    acc[disc].push(track);
+
+    return acc;
+  }, {});
+
+  return (
+    <section className="release_desktop_modal">
+      {loadingDetail && <CircularProgress />}
+
+      {!loadingDetail && releaseDetail && (
+        <section className="release_desktop_modal">
+          <section className="release_desktop_modal_top_zone">
+            <div className="release_cover_area_desktop_modal">
+              {/* Cover */}
+              {releaseDetail.cover?.[0]?.image_url && (
+                <img
+                  src={`${imageBaseUrl}/${releaseDetail.cover[0].image_url}`}
+                  alt={releaseDetail.title}
+                  style={{ width: '100%', marginBottom: 16 }}
+                />
+              )}
+            </div>
+            <div className="release_info_area_desktop_modal">
+              <Typography gutterBottom>
+                <Typography component="span" fontWeight="bold">
+                  Titres:
+                </Typography>{' '}
+                {releaseDetail?.title}
+              </Typography>
+
+              <Typography gutterBottom>
+                <Typography component="span" fontWeight="bold">
+                  Artistes:
+                </Typography>{' '}
+                {releaseDetail.artists.map((a) => a.name).join(', ')}
+              </Typography>
+
+              <Typography gutterBottom>
+                <Typography component="span" fontWeight="bold">
+                  Labels:
+                </Typography>{' '}
+                {releaseDetail.labels.map((l) => `${l.name}`).join(', ')}
+              </Typography>
+
+              {releaseDetail.genres && (
+                <Typography gutterBottom>
+                  <Typography component="span" fontWeight="bold">
+                    Genres:
+                  </Typography>{' '}
+                  {releaseDetail.genres.map((g) => g.name).join(', ')}
+                </Typography>
+              )}
+
+              {releaseDetail.styles?.length && (
+                <Typography gutterBottom>
+                  <Typography component="span" fontWeight="bold">
+                    Styles:
+                  </Typography>{' '}
+                  {releaseDetail.styles.map((s) => s.name).join(', ')}
+                </Typography>
+              )}
+
+              {releaseDetail.year && releaseDetail.year > 0 && (
+                <Typography gutterBottom>
+                  <Typography component="span" fontWeight="bold">
+                    Année:
+                  </Typography>{' '}
+                  {releaseDetail.year}
+                </Typography>
+              )}
+
+              {releaseDetail.country && (
+                <Typography gutterBottom>
+                  <Typography component="span" fontWeight="bold">
+                    Pays:
+                  </Typography>{' '}
+                  {releaseDetail.country}
+                </Typography>
+              )}
+
+              {releaseDetail.barcode && (
+                <Typography gutterBottom>
+                  <Typography component="span" fontWeight="bold">
+                    Barcode:
+                  </Typography>{' '}
+                  {releaseDetail.barcode}
+                </Typography>
+              )}
+              <Typography gutterBottom>
+                <Typography component="span" fontWeight="bold">
+                  Type:
+                </Typography>{' '}
+                {releaseDetail.release_type && `${releaseDetail.release_type}`}{' '}
+                {firstTrack?.size && ` / ${firstTrack.size}`}
+                {firstTrack?.speed && ` / ${firstTrack.speed} RPM`}
+              </Typography>
+            </div>
+          </section>
+          <section className="release_desktop_modal_down_zone">
+            {/* Tracklist */}
+            {groupedTracks && (
+              <>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant="h6" gutterBottom>
+                  Tracklist
+                </Typography>
+
+                {Object.entries(groupedTracks).map(([discNumber, tracks]) => (
+                  <div key={discNumber}>
+                    <Typography variant="subtitle1" gutterBottom sx={{ marginTop: '5px' }}>
+                      Disc {discNumber}
+                    </Typography>
+
+                    {tracks.map((track) => (
+                      <Typography key={`${track.disc_number}-${track.position}`} variant="body2">
+                        {track.position} - {track.title}
+                      </Typography>
+                    ))}
+                  </div>
+                ))}
+              </>
+            )}
+
+            {releaseDetail.notes && (
+              <>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant="h6" gutterBottom>
+                  Notes
+                </Typography>
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+                  {releaseDetail.notes}
+                </Typography>
+              </>
+            )}
+
+            {(discogsLink || youtubeLink) && (
+              <>
+                <Divider sx={{ my: 2 }} />
+
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: 2,
+                  }}
+                >
+                  {discogsLink && (
+                    <IconButton
+                      component="a"
+                      href={discogsLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img src={DiscogsLogo} alt="Discogs" style={{ height: 40 }} />
+                    </IconButton>
+                  )}
+
+                  {youtubeLink && (
+                    <IconButton
+                      component="a"
+                      href={youtubeLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img src={YoutubeLogo} alt="YouTube" style={{ height: 40 }} />
+                    </IconButton>
+                  )}
+                </Box>
+              </>
+            )}
+            {/* 🔥 BOUTON EDIT */}
+            <Box sx={{ mt: 3, textAlign: 'center' }}>
+              <Button variant="contained" onClick={onEdit}>
+                Modifier
+              </Button>
+            </Box>
+          </section>
+        </section>
+      )}
+    </section>
+  );
+}
+
+export default ReleaseDetailView;
