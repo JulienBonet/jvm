@@ -54,6 +54,7 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
     barcode: '',
     release_type: '',
     notes: '',
+    discogs_id: '',
   });
   const [artists, setArtists] = useState<Entity[]>([]);
   const [labels, setLabels] = useState<Entity[]>([]);
@@ -65,8 +66,6 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
     size: '',
     speed: '',
   });
-  // discogsId states
-  const [discogsId, setDiscogsId] = useState<string>('');
   // cover image states
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string>(`${cloudinaryUrl}/${DEFAULT_COVER}`);
@@ -78,7 +77,6 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
   //  RESET FUNCTION
   // -----------------------
   const resetForm = () => {
-    setDiscogsId('');
 
     setRelease({
       title: '',
@@ -87,6 +85,7 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
       barcode: '',
       release_type: '',
       notes: '',
+      discogs_id: '',
     });
 
     setDisc({
@@ -252,13 +251,14 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
 
   const handleDiscogsFetch = async (): Promise<void> => {
     try {
-      const response = await fetch(`${backendUrl}/api/release/discogs/${discogsId}`);
+      const response = await fetch(`${backendUrl}/api/release/discogs/${release.discogs_id}`);
 
       if (!response.ok) {
         throw new Error('Discogs fetch error');
       }
 
       const data = await response.json();
+      console.info('fetchCreateData', data);
 
       // Vérification du message d'erreur renvoyé par Discogs
       if (data.message) {
@@ -292,6 +292,7 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
       // gestion de l'integer de year
       const releasePayload = {
         ...release,
+        discogs_id: release.discogs_id ? parseInt(release.discogs_id, 10) : null,
         year: release.year ? parseInt(release.year, 10) : null,
       };
 
@@ -315,7 +316,6 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
           { platform: 'youtube', url: youtubeLink },
         ]),
       );
-
 
       // envoi post formData
       const response = await fetch(`${backendUrl}/api/release`, {
@@ -388,12 +388,12 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
               <TextField
                 label="Discogs ID"
                 type="number"
-                value={discogsId}
-                onChange={(e) => setDiscogsId(e.target.value)}
+                value={release.discogs_id}
+                onChange={(e) => setRelease({ ...release, discogs_id: e.target.value })}
                 fullWidth
               />
 
-              <Button variant="contained" disabled={!discogsId} onClick={handleDiscogsFetch}>
+              <Button variant="contained" disabled={!release.discogs_id} onClick={handleDiscogsFetch}>
                 SUBMIT
               </Button>
             </Stack>

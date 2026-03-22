@@ -37,6 +37,8 @@ function ReleaseDetailView({
     return acc;
   }, {});
 
+console.info("releaseDetail in view", releaseDetail)
+
   return (
     <section className="release_desktop_modal">
       {loadingDetail && <CircularProgress />}

@@ -85,6 +85,7 @@ export interface ReleaseState {
   release_type: string;
   notes: string;
   discogs_image_url?: string;
+  discogs_id: string;
 }
 
 export interface DiscState {

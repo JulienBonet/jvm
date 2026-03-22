@@ -1,79 +1,465 @@
 import { useEffect, useState } from 'react';
-import { Button, Stack, TextField, Typography } from '@mui/material';
+import {
+  Typography,
+  TextField,
+  Stack,
+  MenuItem,
+  Button,
+  IconButton,
+  Card,
+  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-import { ReleaseMDetail } from '../../types/entities/release.types';
+import EntitySelector from '../Admin/EntitySelector';
+import { ReleaseMDetail, DiscogsRelease, Entity } from '../../types/entities/release.types';
+import { createTrack } from '../../types/entities/track.types';
 
-interface Props {
+interface ReleaseEditFormProps {
   releaseDetail: ReleaseMDetail | null;
   imageBaseUrl: string;
   onCancel: () => void;
   onUpdated: () => void;
+  onSnackbar?: (msg: string, type?: 'success' | 'error') => void;
 }
 
-function ReleaseEditForm({ releaseDetail, onCancel, onUpdated }: Props) {
+function ReleaseEditForm({
+  releaseDetail,
+  imageBaseUrl,
+  onCancel,
+  onUpdated,
+  onSnackbar,
+}: ReleaseEditFormProps) {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-  const [title, setTitle] = useState('');
-  const [year, setYear] = useState('');
+  const releaseTypes = ['LP', 'Album', 'Single', 'EP', 'Maxi-Single', 'Mini-Album'];
+  const releaseSizes = ['7', '10', '12'];
+  const releaseSpeeds = ['33', '45', '78'];
 
-  console.info("title", title)
+  // -----------------------
+  // STATES
+  // -----------------------
+  const [release, setRelease] = useState({
+    title: '',
+    year: '',
+    country: '',
+    barcode: '',
+    release_type: '',
+    notes: '',
+    image_url: '',
+    discogs_id: '',
+  });
 
-  // 🧠 PREFILL (IMPORTANT)
+  const [artists, setArtists] = useState<Entity[]>([]);
+  const [labels, setLabels] = useState<Entity[]>([]);
+  const [genres, setGenres] = useState<Entity[]>([]);
+  const [styles, setStyles] = useState<Entity[]>([]);
+
+  const [tracks, setTracks] = useState<createTrack[]>([]);
+  const [disc, setDisc] = useState({
+    format: '',
+    size: '',
+    speed: '',
+  });
+
+  const [discogsLink, setDiscogLink] = useState('');
+  const [youtubeLink, setYoutubeLink] = useState('');
+
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState('');
+  const [initialCover, setInitialCover] = useState('');
+
+  console.info('releaseDetail in edit', releaseDetail);
+  console.info('coverPreview', coverPreview);
+
+  // -----------------------
+  // PREFILL 🔥
+  // -----------------------
   useEffect(() => {
     if (!releaseDetail) return;
 
-    setTitle(releaseDetail.title || '');
-    setYear(releaseDetail.year ? String(releaseDetail.year) : '');
+    const firstTrack = releaseDetail?.tracks?.[0];
+    const coverUrl = releaseDetail?.cover?.[0]?.image_url
+      ? `${imageBaseUrl}/${releaseDetail.cover[0].image_url}`
+      : '';
+    setInitialCover(coverUrl);
+
+    setRelease({
+      title: releaseDetail.title || '',
+      year: releaseDetail.year ? String(releaseDetail.year) : '',
+      country: releaseDetail.country || '',
+      barcode: releaseDetail.barcode || '',
+      release_type: releaseDetail.release_type || '',
+      notes: releaseDetail.notes || '',
+      image_url: coverUrl || '',
+      discogs_image_url: '',
+      discogs_id: releaseDetail.discogs_id || '',
+    });
+
+    setArtists(releaseDetail.artists || []);
+    setLabels(releaseDetail.labels || []);
+    setGenres(releaseDetail.genres || []);
+    setStyles(releaseDetail.styles || []);
+    setTracks(releaseDetail.tracks || []);
+
+    setDisc({
+      format: releaseDetail.release_type || '',
+      size: firstTrack?.size ? String(firstTrack.size) : '',
+      speed: firstTrack?.speed ? String(firstTrack.speed) : '',
+    });
+
+    setDiscogLink(releaseDetail.links?.find((l) => l.platform === 'discogs')?.url || '');
+
+    setYoutubeLink(releaseDetail.links?.find((l) => l.platform === 'youtube')?.url || '');
   }, [releaseDetail]);
 
+  // -----------------------
+  // COVER PREVIEW 🔥
+  // -----------------------
+  useEffect(() => {
+    let objectUrl: string | undefined;
+
+    if (coverFile) {
+      objectUrl = URL.createObjectURL(coverFile);
+      setCoverPreview(objectUrl);
+    } else if (release.discogs_image_url) {
+      setCoverPreview(release.discogs_image_url);
+    } else if (release.image_url) {
+      setCoverPreview(release.image_url);
+    } else {
+      setCoverPreview(`${imageBaseUrl}/00_release_default`);
+    }
+
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [coverFile, release, imageBaseUrl]);
+
+  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setCoverFile(file);
+  };
+
+  const removeCover = () => {
+    setCoverFile(null);
+    setRelease((prev) => ({
+      ...prev,
+      image_url: initialCover,
+      discogs_image_url: '',
+    }));
+  };
+
+  // -----------------------
+  // TRACKS
+  // -----------------------
+  const updateTrack = (index: number, field: keyof createTrack, value: string) => {
+    const updated = [...tracks];
+    if (!updated[index]) return;
+    updated[index][field] = value;
+    setTracks(updated);
+  };
+
+  const addTrack = () => {
+    setTracks([...tracks, { position: '', title: '', duration: '' }]);
+  };
+
+  const removeTrack = (index: number) => {
+    setTracks(tracks.filter((_, i) => i !== index));
+  };
+
+  // -----------------------
+  // DISCOGS IMPORT 🔥
+  // -----------------------
+  const populateRelease = (data: DiscogsRelease) => {
+    const barcode = data.identifiers?.find((id) => id.type === 'Barcode')?.value ?? '';
+
+    setRelease((prev) => ({
+      ...prev,
+      title: data.title ?? '',
+      year: data.year ? String(data.year) : '',
+      country: data.country ?? '',
+      barcode: barcode.replace(/\s/g, ''),
+      notes: data.notes ?? '',
+      discogs_image_url: data.images?.[0]?.uri ?? '',
+    }));
+
+    setArtists(
+      data.artists?.map((a) => ({
+        name: a.name,
+        discogs_id: a.id,
+      })) ?? [],
+    );
+
+    setLabels(
+      data.labels?.map((l) => ({
+        name: l.name,
+        discogs_id: l.id,
+      })) ?? [],
+    );
+
+    setGenres(data.genres?.map((g) => ({ name: g })) ?? []);
+    setStyles(data.styles?.map((s) => ({ name: s })) ?? []);
+
+    setTracks(data.tracklist ?? []);
+
+    setDiscogLink(data.uri ?? '');
+    setYoutubeLink(data.videos?.[0]?.uri ?? '');
+  };
+
+  const handleDiscogsFetch = async () => {
+    try {
+      const res = await fetch(`${backendUrl}/api/release/discogs/${releaseDetail?.discogs_id}`);
+      const data = await res.json();
+
+      console.info('data', data);
+
+      if (data.message) {
+        onSnackbar?.(data.message, 'error');
+        return;
+      }
+
+      populateRelease(data);
+    } catch (err) {
+      console.error(err);
+      onSnackbar?.('Erreur Discogs', 'error');
+    }
+  };
+
+  // -----------------------
+  // VALIDATION
+  // -----------------------
+  const durationRegex: RegExp = /^(\d{1,2}:)?\d{1,2}:\d{2}$/;
+
+  // -----------------------
+  // SUBMIT 🔥
+  // -----------------------
   const handleSubmit = async () => {
     if (!releaseDetail) return;
 
     try {
       const formData = new FormData();
 
-      // champs simples
-      if (title !== releaseDetail.title) formData.append('title', title);
-      if (year !== String(releaseDetail.year)) formData.append('year', year);
+      const payload = {
+        ...release,
+        year: release.year ? parseInt(release.year, 10) : null,
+      };
 
-      // artistes / labels / genres / styles / links
-      // n'envoyer que si tu modifies
-      // ex : formData.append('artists', JSON.stringify(updatedArtists));
+      formData.append('release', JSON.stringify(payload));
+      formData.append('artists', JSON.stringify(artists));
+      formData.append('labels', JSON.stringify(labels));
+      formData.append('genres', JSON.stringify(genres));
+      formData.append('styles', JSON.stringify(styles));
+      formData.append('tracks', JSON.stringify(tracks));
+      formData.append('disc', JSON.stringify(disc));
 
-      // image
-      // si utilisateur upload un fichier
-      // formData.append('file', file);
+      formData.append(
+        'links',
+        JSON.stringify([
+          { platform: 'discogs', url: discogsLink },
+          { platform: 'youtube', url: youtubeLink },
+        ]),
+      );
 
-      console.info('formData', formData);
+      if (coverFile) formData.append('file', coverFile);
 
-      const response = await fetch(`${backendUrl}/api/release/${releaseDetail.id}`, {
+      const res = await fetch(`${backendUrl}/api/release/${releaseDetail.id}`, {
         method: 'PUT',
         body: formData,
       });
 
-      if (!response.ok) throw new Error('Update failed');
-      
+      if (!res.ok) throw new Error();
 
+      onSnackbar?.('Release updated', 'success');
       onUpdated();
-    } catch (error) {
-      console.error(error);
+      onCancel();
+    } catch (err) {
+      console.error(err);
+      onSnackbar?.('Erreur update', 'error');
     }
   };
 
+  if (!releaseDetail) return null;
+
   return (
-    <Stack spacing={2}>
-      <Typography variant="h6">Edit Release</Typography>
+    <Stack spacing={3}>
+      <Typography sx={{
+            fontFamily: 'var(--font-01)',
+            fontSize: 'x-large',
+          }}>Edit Release</Typography>
 
-      <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+      {/* DISCOGS */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Import from Discogs
+          </Typography>
+          <Stack direction="row" spacing={2}>
+            <TextField
+              label="Discogs ID"
+              value={release.discogs_id}
+              onChange={(e) => setRelease({ ...release, discogs_id: e.target.value })}
+            />
+            <Button onClick={handleDiscogsFetch} disabled={!release.discogs_id} variant="contained">
+              IMPORT
+            </Button>
+          </Stack>
+        </CardContent>
+      </Card>
 
-      <TextField label="Year" value={year} onChange={(e) => setYear(e.target.value)} />
+      {/* RELEASE INFO */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Release Info
+          </Typography>
+          <Stack spacing={2}>
+            <TextField
+              label="Title"
+              value={release.title}
+              onChange={(e) => setRelease({ ...release, title: e.target.value })}
+            />
 
-      <Stack direction="row" spacing={2}>
-        <Button onClick={onCancel}>Annuler</Button>
-        <Button variant="contained" onClick={handleSubmit}>
-          Enregistrer
-        </Button>
-      </Stack>
+            <TextField
+              label="Year"
+              value={release.year}
+              onChange={(e) => setRelease({ ...release, year: e.target.value })}
+            />
+
+            <TextField
+              label="Country"
+              value={release.country}
+              onChange={(e) => setRelease({ ...release, country: e.target.value })}
+            />
+
+            <TextField
+              label="Barcode"
+              value={release.barcode}
+              onChange={(e) => setRelease({ ...release, barcode: e.target.value })}
+            />
+
+            <TextField
+              select
+              label="Type"
+              value={release.release_type}
+              onChange={(e) => setRelease({ ...release, release_type: e.target.value })}
+            >
+              {releaseTypes.map((t) => (
+                <MenuItem key={t} value={t}>
+                  {t}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
+              select
+              label="Size"
+              value={disc.size}
+              onChange={(e) => setDisc({ ...disc, size: e.target.value })}
+            >
+              {releaseSizes.map((s) => (
+                <MenuItem key={s} value={s}>
+                  {s}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
+              select
+              label="Speed"
+              value={disc.speed}
+              onChange={(e) => setDisc({ ...disc, speed: e.target.value })}
+            >
+              {releaseSpeeds.map((s) => (
+                <MenuItem key={s} value={s}>
+                  {s}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Stack>
+        </CardContent>
+      </Card>
+
+      {/* COVER */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Stack direction="column" spacing={2} alignItems="center">
+            <img
+              src={coverPreview}
+              alt="Cover Preview"
+              style={{ width: 150, height: 150, objectFit: 'cover', borderRadius: 4 }}
+            />
+
+            <Button variant="outlined" component="label">
+              Upload
+              <input hidden type="file" onChange={handleCoverChange} />
+            </Button>
+            <Button onClick={removeCover}>Remove</Button>
+          </Stack>
+        </CardContent>
+      </Card>
+
+      {/* TRACKS */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Tracklist
+          </Typography>
+          <Table>
+            <TableBody>
+              {tracks.map((t, i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <TextField
+                      value={t.position}
+                      onChange={(e) => updateTrack(i, 'position', e.target.value)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      value={t.title}
+                      onChange={(e) => updateTrack(i, 'title', e.target.value)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      value={t.duration}
+                      error={Boolean(t.duration && !durationRegex.test(t.duration))}
+                      onChange={(e) => updateTrack(i, 'duration', e.target.value)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => removeTrack(i)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <Stack alignItems="center">
+            <Button sx={{ mt: 2 }} variant="contained" onClick={addTrack}>
+              Add Track
+            </Button>
+          </Stack>
+        </CardContent>
+      </Card>
+
+      {/* ACTIONS */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
+            <Button variant="outlined"color="error" onClick={onCancel}>Cancel</Button>
+            <Button variant="contained" onClick={handleSubmit}>
+              Save
+            </Button>
+          </Stack>
+        </CardContent>
+      </Card>
     </Stack>
   );
 }
