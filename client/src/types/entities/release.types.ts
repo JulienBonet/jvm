@@ -62,7 +62,7 @@ export interface ReleaseMDetail {
   notes?: string;
   release_type?: string;
 
-  discogs_id?: string; 
+  discogs_id?: number;
 
   artists: Artist[];
   labels: { name: string; catalog_number?: string }[];
@@ -75,7 +75,6 @@ export interface ReleaseMDetail {
   tracks?: Track[];
 
   links?: ReleaseLink[];
-  
 }
 
 // create realease
@@ -171,7 +170,7 @@ export interface ReleaseFormState {
   release_type: string;
   notes: string;
   image_url: string;
-  discogs_id: string;
+  discogs_id: number | null;
   discogs_image_url?: string;
 }
 

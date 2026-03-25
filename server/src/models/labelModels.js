@@ -273,6 +273,10 @@ export const getLabelImage = async (connection, labelId) => {
   return rows[0]?.url || '00_label_default';
 };
 
+export const updateLabelDiscogsId = async (connection, labelId, discogsId) => {
+  await connection.query('UPDATE label SET discogs_id = ? WHERE id = ?', [discogsId, labelId]);
+};
+
 /* ===============================
    DELETE
 ================================= */

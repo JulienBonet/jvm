@@ -17,7 +17,13 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import EntitySelector from '../Admin/EntitySelector';
-import { ReleaseMDetail, ReleaseFormState, DiscFormState, DiscogsRelease, Entity } from '../../types/entities/release.types';
+import {
+  ReleaseMDetail,
+  ReleaseFormState,
+  DiscFormState,
+  DiscogsRelease,
+  Entity,
+} from '../../types/entities/release.types';
 import { createTrack } from '../../types/entities/track.types';
 
 interface ReleaseEditFormProps {
@@ -27,8 +33,6 @@ interface ReleaseEditFormProps {
   onUpdated: () => void;
   onSnackbar?: (msg: string, type?: 'success' | 'error') => void;
 }
-
-
 
 function ReleaseEditForm({
   releaseDetail,
@@ -54,7 +58,7 @@ function ReleaseEditForm({
     release_type: '',
     notes: '',
     image_url: '',
-    discogs_id: '',
+    discogs_id: null,
     discogs_image_url: undefined,
   });
 
@@ -76,6 +80,8 @@ function ReleaseEditForm({
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState('');
   const [initialCover, setInitialCover] = useState('');
+
+  const [loading, setLoading] = useState(false);
 
   console.info('releaseDetail in edit', releaseDetail);
 
@@ -100,7 +106,7 @@ function ReleaseEditForm({
       notes: releaseDetail.notes || '',
       image_url: coverUrl || '',
       discogs_image_url: '',
-      discogs_id: releaseDetail.discogs_id ?? '',
+      discogs_id: releaseDetail.discogs_id ?? null,
     });
 
     setArtists(releaseDetail.artists || []);
@@ -258,6 +264,7 @@ function ReleaseEditForm({
     if (!releaseDetail) return;
 
     try {
+      setLoading(true);
       const formData = new FormData();
 
       const payload = {
@@ -296,7 +303,9 @@ function ReleaseEditForm({
     } catch (err) {
       console.error(err);
       onSnackbar?.('Erreur update', 'error');
-    }
+    }finally {
+    setLoading(false);
+  }
   };
 
   if (!releaseDetail) return null;
@@ -322,7 +331,12 @@ function ReleaseEditForm({
             <TextField
               label="Discogs ID"
               value={release.discogs_id}
-              onChange={(e) => setRelease({ ...release, discogs_id: e.target.value })}
+              onChange={(e) =>
+                setRelease({
+                  ...release,
+                  discogs_id: e.target.value ? Number(e.target.value) : null,
+                })
+              }
             />
             <Button onClick={handleDiscogsFetch} disabled={!release.discogs_id} variant="contained">
               IMPORT
@@ -561,11 +575,11 @@ function ReleaseEditForm({
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
-            <Button variant="outlined" color="error" onClick={onCancel}>
+            <Button variant="outlined" color="error" onClick={onCancel} disabled={loading}>
               Cancel
             </Button>
-            <Button variant="contained" onClick={handleSubmit}>
-              Save
+            <Button variant="contained" onClick={handleSubmit} disabled={loading}>
+              {loading ? 'Saving...' : 'Save'}
             </Button>
           </Stack>
         </CardContent>
