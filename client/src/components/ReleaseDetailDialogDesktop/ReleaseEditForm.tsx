@@ -15,7 +15,7 @@ import {
   TableRow,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import CircularProgress from '@mui/material/CircularProgress';
 import EntitySelector from '../Admin/EntitySelector';
 import {
   ReleaseMDetail,
@@ -80,8 +80,6 @@ function ReleaseEditForm({
   const [youtubeLink, setYoutubeLink] = useState('');
   // Loader
   const [loading, setLoading] = useState(false);
-
-  console.info('releaseDetail in edit', releaseDetail);
 
   // -----------------------
   // PREFILL 🔥
@@ -227,16 +225,12 @@ function ReleaseEditForm({
 
   const handleDiscogsFetch = async () => {
     try {
-      console.info('fetch discog');
-      console.log('Discogs ID envoyé →', release.discogs_id);
       if (!release.discogs_id) {
         onSnackbar?.('Discogs ID manquant', 'error');
         return;
       }
       const res = await fetch(`${backendUrl}/api/release/discogs/${release.discogs_id}`);
       const data = await res.json();
-
-      console.info('data', data);
 
       if (data.message) {
         onSnackbar?.(data.message, 'error');
@@ -309,287 +303,308 @@ function ReleaseEditForm({
   if (!releaseDetail) return null;
 
   return (
-    <Stack
-      spacing={3}
-      sx={{
-        opacity: loading ? 0.5 : 1,
-        pointerEvents: loading ? 'none' : 'auto',
-        transition: 'opacity 0.2s ease',
-      }}
-    >
-      <Typography
-        sx={{
-          fontFamily: 'var(--font-01)',
-          fontSize: 'x-large',
-        }}
-      >
-        Edit Release
-      </Typography>
+    <div style={{ position: 'relative' }}>
+      {loading && (
+        <Stack
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 10,
+            backgroundColor: 'rgba(255,255,255,0.6)',
+            backdropFilter: 'blur(2px)',
+            borderRadius: 2,
 
-      {/* DISCOGS */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Import from Discogs
-          </Typography>
-          <Stack direction="row" spacing={2}>
-            <TextField
-              label="Discogs ID"
-              value={release.discogs_id}
-              onChange={(e) =>
-                setRelease({
-                  ...release,
-                  discogs_id: e.target.value ? Number(e.target.value) : null,
-                })
-              }
-            />
-            <Button onClick={handleDiscogsFetch} disabled={!release.discogs_id} variant="contained">
-              IMPORT
-            </Button>
+            display: 'flex',
+            justifyContent: 'flex-end', // 👈 clé ici
+            alignItems: 'center',
+            pb: 3, // petit espace en bas
+          }}
+        >
+          <Stack alignItems="center" spacing={1}>
+            <CircularProgress />
+            <Typography variant="body2">Updating release...</Typography>
           </Stack>
-        </CardContent>
-      </Card>
+        </Stack>
+      )}
+      <Stack spacing={3}>
+        <Typography
+          sx={{
+            fontFamily: 'var(--font-01)',
+            fontSize: 'x-large',
+          }}
+        >
+          Edit Release
+        </Typography>
 
-      {/* RELEASE INFO */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Release Info
-          </Typography>
-          <Stack spacing={2}>
-            <TextField
-              label="Title"
-              value={release.title}
-              onChange={(e) => setRelease({ ...release, title: e.target.value })}
-            />
+        {/* DISCOGS */}
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Import from Discogs
+            </Typography>
+            <Stack direction="row" spacing={2}>
+              <TextField
+                label="Discogs ID"
+                value={release.discogs_id}
+                onChange={(e) =>
+                  setRelease({
+                    ...release,
+                    discogs_id: e.target.value ? Number(e.target.value) : null,
+                  })
+                }
+              />
+              <Button
+                onClick={handleDiscogsFetch}
+                disabled={!release.discogs_id}
+                variant="contained"
+              >
+                IMPORT
+              </Button>
+            </Stack>
+          </CardContent>
+        </Card>
 
-            <TextField
-              label="Year"
-              value={release.year}
-              onChange={(e) => setRelease({ ...release, year: e.target.value })}
-            />
+        {/* RELEASE INFO */}
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Release Info
+            </Typography>
+            <Stack spacing={2}>
+              <TextField
+                label="Title"
+                value={release.title}
+                onChange={(e) => setRelease({ ...release, title: e.target.value })}
+              />
 
-            <TextField
-              label="Country"
-              value={release.country}
-              onChange={(e) => setRelease({ ...release, country: e.target.value })}
-            />
+              <TextField
+                label="Year"
+                value={release.year}
+                onChange={(e) => setRelease({ ...release, year: e.target.value })}
+              />
 
-            <TextField
-              label="Barcode"
-              value={release.barcode}
-              onChange={(e) => setRelease({ ...release, barcode: e.target.value })}
-            />
+              <TextField
+                label="Country"
+                value={release.country}
+                onChange={(e) => setRelease({ ...release, country: e.target.value })}
+              />
 
-            <TextField
-              select
-              label="Type"
-              value={release.release_type}
-              onChange={(e) => setRelease({ ...release, release_type: e.target.value })}
-            >
-              {releaseTypes.map((t) => (
-                <MenuItem key={t} value={t}>
-                  {t}
-                </MenuItem>
-              ))}
-            </TextField>
+              <TextField
+                label="Barcode"
+                value={release.barcode}
+                onChange={(e) => setRelease({ ...release, barcode: e.target.value })}
+              />
 
-            <TextField
-              select
-              label="Size"
-              value={disc.size}
-              onChange={(e) => setDisc({ ...disc, size: e.target.value })}
-            >
-              {releaseSizes.map((s) => (
-                <MenuItem key={s} value={s}>
-                  {s}
-                </MenuItem>
-              ))}
-            </TextField>
+              <TextField
+                select
+                label="Type"
+                value={release.release_type}
+                onChange={(e) => setRelease({ ...release, release_type: e.target.value })}
+              >
+                {releaseTypes.map((t) => (
+                  <MenuItem key={t} value={t}>
+                    {t}
+                  </MenuItem>
+                ))}
+              </TextField>
 
-            <TextField
-              select
-              label="Speed"
-              value={disc.speed}
-              onChange={(e) => setDisc({ ...disc, speed: e.target.value })}
-            >
-              {releaseSpeeds.map((s) => (
-                <MenuItem key={s} value={s}>
-                  {s}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Stack>
-        </CardContent>
-      </Card>
+              <TextField
+                select
+                label="Size"
+                value={disc.size}
+                onChange={(e) => setDisc({ ...disc, size: e.target.value })}
+              >
+                {releaseSizes.map((s) => (
+                  <MenuItem key={s} value={s}>
+                    {s}
+                  </MenuItem>
+                ))}
+              </TextField>
 
-      {/* GENRE / STYLE */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Genre / Style
-          </Typography>
+              <TextField
+                select
+                label="Speed"
+                value={disc.speed}
+                onChange={(e) => setDisc({ ...disc, speed: e.target.value })}
+              >
+                {releaseSpeeds.map((s) => (
+                  <MenuItem key={s} value={s}>
+                    {s}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Stack>
+          </CardContent>
+        </Card>
 
-          <Stack spacing={2}>
-            <EntitySelector
-              label="Genres"
-              endpoint="genre/search"
-              value={genres}
-              onChange={setGenres}
-            />
+        {/* GENRE / STYLE */}
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Genre / Style
+            </Typography>
 
-            <EntitySelector
-              label="Styles"
-              endpoint="style/search"
-              value={styles}
-              onChange={setStyles}
-            />
-          </Stack>
-        </CardContent>
-      </Card>
+            <Stack spacing={2}>
+              <EntitySelector
+                label="Genres"
+                endpoint="genre/search"
+                value={genres}
+                onChange={setGenres}
+              />
 
-      {/* ARTIST / LABEL */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Artist / Label
-          </Typography>
+              <EntitySelector
+                label="Styles"
+                endpoint="style/search"
+                value={styles}
+                onChange={setStyles}
+              />
+            </Stack>
+          </CardContent>
+        </Card>
 
-          <Stack spacing={2}>
-            <EntitySelector
-              label="Artists"
-              endpoint="artist/search"
-              value={artists}
-              onChange={setArtists}
-            />
+        {/* ARTIST / LABEL */}
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Artist / Label
+            </Typography>
 
-            <EntitySelector
-              label="Labels"
-              endpoint="label/search"
-              value={labels}
-              onChange={setLabels}
-            />
-          </Stack>
-        </CardContent>
-      </Card>
+            <Stack spacing={2}>
+              <EntitySelector
+                label="Artists"
+                endpoint="artist/search"
+                value={artists}
+                onChange={setArtists}
+              />
 
-      {/* EXTERNAL LINKS */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            External Links
-          </Typography>
+              <EntitySelector
+                label="Labels"
+                endpoint="label/search"
+                value={labels}
+                onChange={setLabels}
+              />
+            </Stack>
+          </CardContent>
+        </Card>
 
-          <Stack spacing={2}>
-            <TextField
-              fullWidth
-              label="Discogs Link"
-              value={discogsLink}
-              onChange={(e) => setDiscogLink(e.target.value)}
-              error={discogsLink !== '' && !discogsLink.startsWith('https://')}
-              helperText={
-                discogsLink && !discogsLink.startsWith('https://')
-                  ? 'Le lien doit commencer par https://'
-                  : ''
-              }
-            />
+        {/* EXTERNAL LINKS */}
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              External Links
+            </Typography>
 
-            <TextField
-              fullWidth
-              label="YouTube Link"
-              value={youtubeLink}
-              onChange={(e) => setYoutubeLink(e.target.value)}
-              error={youtubeLink !== '' && !youtubeLink.startsWith('https://')}
-              helperText={
-                youtubeLink && !youtubeLink.startsWith('https://')
-                  ? 'Le lien doit commencer par https://'
-                  : ''
-              }
-            />
-          </Stack>
-        </CardContent>
-      </Card>
+            <Stack spacing={2}>
+              <TextField
+                fullWidth
+                label="Discogs Link"
+                value={discogsLink}
+                onChange={(e) => setDiscogLink(e.target.value)}
+                error={discogsLink !== '' && !discogsLink.startsWith('https://')}
+                helperText={
+                  discogsLink && !discogsLink.startsWith('https://')
+                    ? 'Le lien doit commencer par https://'
+                    : ''
+                }
+              />
 
-      {/* TRACKS */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Tracklist
-          </Typography>
-          <Table>
-            <TableBody>
-              {tracks.map((t, i) => (
-                <TableRow key={i}>
-                  <TableCell>
-                    <TextField
-                      value={t.position}
-                      onChange={(e) => updateTrack(i, 'position', e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <TextField
-                      value={t.title}
-                      onChange={(e) => updateTrack(i, 'title', e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <TextField
-                      value={t.duration}
-                      error={Boolean(t.duration && !durationRegex.test(t.duration))}
-                      onChange={(e) => updateTrack(i, 'duration', e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <IconButton onClick={() => removeTrack(i)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <Stack alignItems="center">
-            <Button sx={{ mt: 2 }} variant="contained" onClick={addTrack}>
-              Add Track
-            </Button>
-          </Stack>
-        </CardContent>
-      </Card>
+              <TextField
+                fullWidth
+                label="YouTube Link"
+                value={youtubeLink}
+                onChange={(e) => setYoutubeLink(e.target.value)}
+                error={youtubeLink !== '' && !youtubeLink.startsWith('https://')}
+                helperText={
+                  youtubeLink && !youtubeLink.startsWith('https://')
+                    ? 'Le lien doit commencer par https://'
+                    : ''
+                }
+              />
+            </Stack>
+          </CardContent>
+        </Card>
 
-      {/* COVER */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Stack direction="column" spacing={2} alignItems="center">
-            <Typography variant="h6">Cover Image</Typography>
-            <img
-              src={coverPreview}
-              alt="Cover Preview"
-              style={{ width: 150, height: 150, objectFit: 'cover', borderRadius: 4 }}
-            />
+        {/* TRACKS */}
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Tracklist
+            </Typography>
+            <Table>
+              <TableBody>
+                {tracks.map((t, i) => (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <TextField
+                        value={t.position}
+                        onChange={(e) => updateTrack(i, 'position', e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <TextField
+                        value={t.title}
+                        onChange={(e) => updateTrack(i, 'title', e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <TextField
+                        value={t.duration}
+                        error={Boolean(t.duration && !durationRegex.test(t.duration))}
+                        onChange={(e) => updateTrack(i, 'duration', e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <IconButton onClick={() => removeTrack(i)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <Stack alignItems="center">
+              <Button sx={{ mt: 2 }} variant="contained" onClick={addTrack}>
+                Add Track
+              </Button>
+            </Stack>
+          </CardContent>
+        </Card>
 
-            <Button variant="outlined" component="label">
-              Upload
-              <input hidden type="file" onChange={handleCoverChange} />
-            </Button>
-            <Button onClick={removeCover}>Remove</Button>
-          </Stack>
-        </CardContent>
-      </Card>
+        {/* COVER */}
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Stack direction="column" spacing={2} alignItems="center">
+              <Typography variant="h6">Cover Image</Typography>
+              <img
+                src={coverPreview}
+                alt="Cover Preview"
+                style={{ width: 150, height: 150, objectFit: 'cover', borderRadius: 4 }}
+              />
 
-      {/* ACTIONS */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
-            <Button variant="outlined" color="error" onClick={onCancel} disabled={loading}>
-              Cancel
-            </Button>
-            <Button variant="contained" onClick={handleSubmit} disabled={loading}>
-              {loading ? 'Saving...' : 'Save'}
-            </Button>
-          </Stack>
-        </CardContent>
-      </Card>
-    </Stack>
+              <Button variant="outlined" component="label">
+                Upload
+                <input hidden type="file" onChange={handleCoverChange} />
+              </Button>
+              <Button onClick={removeCover}>Remove</Button>
+            </Stack>
+          </CardContent>
+        </Card>
+
+        {/* ACTIONS */}
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
+              <Button variant="outlined" color="error" onClick={onCancel} disabled={loading}>
+                Cancel
+              </Button>
+              <Button variant="contained" onClick={handleSubmit} disabled={loading}>
+                {loading ? 'Saving...' : 'Save'}
+              </Button>
+            </Stack>
+          </CardContent>
+        </Card>
+      </Stack>
+    </div>
   );
 }
 
