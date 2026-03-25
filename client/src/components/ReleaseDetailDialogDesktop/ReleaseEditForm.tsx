@@ -61,26 +61,24 @@ function ReleaseEditForm({
     discogs_id: null,
     discogs_image_url: undefined,
   });
-
   const [artists, setArtists] = useState<Entity[]>([]);
   const [labels, setLabels] = useState<Entity[]>([]);
   const [genres, setGenres] = useState<Entity[]>([]);
   const [styles, setStyles] = useState<Entity[]>([]);
-
   const [tracks, setTracks] = useState<createTrack[]>([]);
   const [disc, setDisc] = useState<DiscFormState>({
     format: '',
     size: '',
     speed: '',
   });
-
-  const [discogsLink, setDiscogLink] = useState('');
-  const [youtubeLink, setYoutubeLink] = useState('');
-
+  // cover image states
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState('');
   const [initialCover, setInitialCover] = useState('');
-
+  // external link
+  const [discogsLink, setDiscogLink] = useState('');
+  const [youtubeLink, setYoutubeLink] = useState('');
+  // Loader
   const [loading, setLoading] = useState(false);
 
   console.info('releaseDetail in edit', releaseDetail);
@@ -253,7 +251,7 @@ function ReleaseEditForm({
   };
 
   // -----------------------
-  // VALIDATION
+  // REGEX
   // -----------------------
   const durationRegex: RegExp = /^(\d{1,2}:)?\d{1,2}:\d{2}$/;
 
