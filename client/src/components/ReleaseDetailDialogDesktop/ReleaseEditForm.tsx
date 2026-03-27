@@ -20,7 +20,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CircularProgress from '@mui/material/CircularProgress';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
-import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
 import EntitySelector from '../Admin/EntitySelector';
 import {
   ReleaseMDetail,
@@ -605,10 +604,10 @@ function ReleaseEditForm({
               />
 
               <Button variant="contained" component="label" startIcon={<FileUploadIcon />}>
-                Upload
+                Upload Image
                 <input hidden type="file" onChange={handleCoverChange} />
               </Button>
-              <Button variant="outlined" color="error" onClick={removeCover} startIcon={<KeyboardReturnIcon />}>Remove</Button>
+              <Button variant="outlined" color="error" onClick={removeCover}>Remove Image</Button>
             </Stack>
           </CardContent>
         </Card>

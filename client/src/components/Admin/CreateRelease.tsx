@@ -16,8 +16,12 @@ import {
   Dialog,
   DialogTitle,
 } from '@mui/material';
+import SaveIcon from '@mui/icons-material/Save';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 import EntitySelector from './EntitySelector';
 import CircularProgress from '@mui/material/CircularProgress';
 import './createRelease.css';
@@ -674,10 +678,11 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
                   ))}
                 </TableBody>
               </Table>
-
-              <Button sx={{ mt: 2 }} variant="contained" onClick={addTrack}>
+              <Stack alignItems="center">
+              <Button sx={{ mt: 2 }} variant="contained" onClick={addTrack} startIcon={<AddCircleOutlineIcon  />}>
                 Add Track
               </Button>
+              </Stack>
             </CardContent>
           </Card>
 
@@ -693,12 +698,12 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
                   style={{ width: 150, height: 150, objectFit: 'cover', borderRadius: 4 }}
                 />
 
-                <Button variant="outlined" component="label">
+                <Button variant="contained" component="label" startIcon={<FileUploadIcon />}>
                   Upload Image
                   <input hidden type="file" accept="image/*" onChange={handleCoverChange} />
                 </Button>
 
-                <Button onClick={removeCover}>Remove image</Button>
+                <Button variant="outlined" color="error" onClick={removeCover}>Remove image</Button>
               </Stack>
             </CardContent>
           </Card>
@@ -707,16 +712,17 @@ function CreateRelease({ open, onClose, onCreated, onSnackbar }: CreateReleasePr
           <Card sx={{ mb: 3 }}>
             <CardContent>
               <Stack direction="column" spacing={2} alignItems="center">
-                <Button variant="contained" size="large" onClick={handleSubmit} disabled={loading}>
+                <Button variant="contained" size="large" color="success" onClick={handleSubmit} disabled={loading} startIcon={<SaveIcon />}>
                   {loading ? 'Saving...' : 'Create Release'}
                 </Button>
 
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   color="error"
                   size="large"
                   onClick={resetForm}
                   disabled={loading}
+                  startIcon={<RestartAltIcon />}
                 >
                   RESET
                 </Button>
