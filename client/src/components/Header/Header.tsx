@@ -1,4 +1,3 @@
-// client\src\components\Header\Header.tsx
 import { NavLink, Link } from 'react-router-dom';
 import { useState } from 'react';
 import {
@@ -11,14 +10,17 @@ import {
   ListItemText,
   Box,
   Divider,
+  Typography,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useFormat } from '../../context/FormatContext.js';
 import useIsMobile from '../../hooks/useIsMobile.js';
+import { useAuth } from '../../context/AuthContext.js';
 import type { UserFormat } from '../../context/FormatContext.js';
 
 function Header() {
   const { selectedFormat, setSelectedFormat } = useFormat();
+  const { token, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
 
@@ -30,184 +32,112 @@ function Header() {
   };
 
   return (
-    <AppBar
-      position="sticky"
-      sx={{
-        backgroundColor: 'var(--color-01)',
-      }}
-    >
+    <AppBar position="sticky" sx={{ backgroundColor: 'var(--color-01)' }}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/* LOGO */}
         <Box
           component={Link}
           to="/"
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            textDecoration: 'none',
-            color: 'inherit',
-          }}
+          sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}
         >
           <img src="/images/logo.png" alt="Logo" style={{ height: 40 }} />
         </Box>
 
-        {/* BURGER */}
-        <IconButton edge="end" color="inherit" onClick={() => setOpen(true)}>
-          <MenuIcon />
-        </IconButton>
+        {/* BURGER — seulement si connecté */}
+        {token && (
+          <IconButton edge="end" color="inherit" onClick={() => setOpen(true)}>
+            <MenuIcon />
+          </IconButton>
+        )}
       </Toolbar>
 
       {/* DRAWER */}
-      <Drawer
-        anchor="right"
-        open={open}
-        onClose={handleClose}
-        PaperProps={{
-          sx: {
-            height: 'auto', // prend seulement la hauteur du contenu
-            minHeight: 100, // optionnel : un minimum
-            mt: 8, // optionnel : décale depuis le top si tu veux
-          },
-        }}
-      >
-        <Box sx={{ width: 260 }} role="presentation">
-          <List>
-            {isMobile ? (
-              /* 📱 MOBILE → FORMAT */
-              <>
-                <ListItemButton
-                  onClick={() => handleFormatChange('LP')}
-                  sx={{
-                    backgroundColor: selectedFormat === 'LP' ? 'primary.main' : 'transparent',
-                    color: selectedFormat === 'LP' ? 'white' : 'inherit',
-                    '&:hover': {
-                      backgroundColor: selectedFormat === 'LP' ? 'primary.dark' : 'action.hover',
-                    },
-                  }}
-                >
-                  <ListItemText
-                    primary="33 Tours"
-                    primaryTypographyProps={{
-                      sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
-                    }}
-                  />
-                </ListItemButton>
+      {token && (
+        <Drawer
+          anchor="right"
+          open={open}
+          onClose={handleClose}
+          PaperProps={{ sx: { height: 'auto', minHeight: 100, mt: 8 } }}
+        >
+          <Box sx={{ width: 260 }} role="presentation">
+            <List>
+              {isMobile ? (
+                <>
+                  {/* 📱 Mobile → choix format */}
+                  {['LP', 'SINGLE'].map((format) => (
+                    <ListItemButton
+                      key={format}
+                      onClick={() => handleFormatChange(format as UserFormat)}
+                      sx={{
+                        backgroundColor: selectedFormat === format ? 'primary.main' : 'transparent',
+                        color: selectedFormat === format ? 'white' : 'inherit',
+                        '&:hover': {
+                          backgroundColor: selectedFormat === format ? 'primary.dark' : 'action.hover',
+                        },
+                      }}
+                    >
+                      <ListItemText
+                        primary={
+                          <Typography
+                            sx={{ fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 }}
+                          >
+                            {format === 'LP' ? '33 Tours' : '45 Tours'}
+                          </Typography>
+                        }
+                      />
+                    </ListItemButton>
+                  ))}
 
-                <ListItemButton
-                  onClick={() => handleFormatChange('SINGLE')}
-                  sx={{
-                    backgroundColor: selectedFormat === 'SINGLE' ? 'primary.main' : 'transparent',
-                    color: selectedFormat === 'SINGLE' ? 'white' : 'inherit',
-                    '&:hover': {
-                      backgroundColor:
-                        selectedFormat === 'SINGLE' ? 'primary.dark' : 'action.hover',
-                    },
-                  }}
-                >
-                  <ListItemText
-                    primary="45 Tours"
-                    primaryTypographyProps={{
-                      sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
-                    }}
-                  />
-                </ListItemButton>
-              </>
-            ) : (
-              /* 💻 DESKTOP → NAVIGATION */
-              <>
-                <ListItemButton
-                  component={NavLink}
-                  to="/"
-                  onClick={handleClose}
-                  sx={(theme) => ({
-                    '&.active': {
-                      backgroundColor: theme.palette.primary.main,
-                      color: 'white',
-                      '&:hover': {
-                        backgroundColor: theme.palette.primary.dark,
-                      },
-                    },
-                  })}
-                >
-                  <ListItemText
-                    primary="Releases"
-                    primaryTypographyProps={{
-                      sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
-                    }}
-                  />
-                </ListItemButton>
+                  {/* 🔴 Logout mobile */}
+                  <ListItemButton onClick={() => { logout(); setOpen(false); }} sx={{ mt: 2 }}>
+                    <ListItemText
+                      primary={<Typography sx={{ fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500, color: 'red' }}>Logout</Typography>}
+                    />
+                  </ListItemButton>
+                </>
+              ) : (
+                <>
+                  {/* 💻 Desktop → navigation */}
+                  {['/', '/artists', '/labels', '/admin'].map((path) => (
+                    <ListItemButton
+                      key={path}
+                      component={NavLink}
+                      to={path}
+                      onClick={handleClose}
+                      sx={(theme) => ({
+                        '&.active': {
+                          backgroundColor: theme.palette.primary.main,
+                          color: 'white',
+                          '&:hover': { backgroundColor: theme.palette.primary.dark },
+                        },
+                      })}
+                    >
+                      <ListItemText
+                        primary={
+                          <Typography sx={{ fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 }}>
+                            {path === '/' ? 'Releases' :
+                             path === '/artists' ? 'Artists' :
+                             path === '/labels' ? 'Labels' : 'Admin'}
+                          </Typography>
+                        }
+                      />
+                    </ListItemButton>
+                  ))}
 
-                <ListItemButton
-                  component={NavLink}
-                  to="/artists"
-                  onClick={handleClose}
-                  sx={(theme) => ({
-                    '&.active': {
-                      backgroundColor: theme.palette.primary.main,
-                      color: 'white',
-                      '&:hover': {
-                        backgroundColor: theme.palette.primary.dark,
-                      },
-                    },
-                  })}
-                >
-                  <ListItemText
-                    primary="Artists"
-                    primaryTypographyProps={{
-                      sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
-                    }}
-                  />
-                </ListItemButton>
+                  {/* 🔴 Logout desktop */}
+                  <ListItemButton onClick={logout} sx={{ mt: 1 }}>
+                    <ListItemText
+                      primary={<Typography sx={{ fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500, color: 'red' }}>Logout</Typography>}
+                    />
+                  </ListItemButton>
+                </>
+              )}
+            </List>
 
-                <ListItemButton
-                  component={NavLink}
-                  to="/labels"
-                  onClick={handleClose}
-                  sx={(theme) => ({
-                    '&.active': {
-                      backgroundColor: theme.palette.primary.main,
-                      color: 'white',
-                      '&:hover': {
-                        backgroundColor: theme.palette.primary.dark,
-                      },
-                    },
-                  })}
-                >
-                  <ListItemText
-                    primary="Labels"
-                    primaryTypographyProps={{
-                      sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
-                    }}
-                  />
-                </ListItemButton>
-                <ListItemButton
-                  component={NavLink}
-                  to="/admin"
-                  onClick={handleClose}
-                  sx={(theme) => ({
-                    '&.active': {
-                      backgroundColor: theme.palette.primary.main,
-                      color: 'white',
-                      '&:hover': {
-                        backgroundColor: theme.palette.primary.dark,
-                      },
-                    },
-                  })}
-                >
-                  <ListItemText
-                    primary="Admin"
-                    primaryTypographyProps={{
-                      sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
-                    }}
-                  />
-                </ListItemButton>
-              </>
-            )}
-          </List>
-
-          <Divider />
-        </Box>
-      </Drawer>
+            <Divider />
+          </Box>
+        </Drawer>
+      )}
     </AppBar>
   );
 }

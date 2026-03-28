@@ -12,66 +12,71 @@ import ArtistsAdmin from '../pages/Admin/ArtistsAdmin/ArtistsAdmin.tsx';
 import LabelsAdmin from '../pages/Admin/LabelsAdmin/LabelsAdmin.tsx';
 import GenresAdmin from '../pages/Admin/GenresAdmin/GenresAdmin.tsx';
 import StylesAdmin from '../pages/Admin/StylesAdmin/StylesAdmin.tsx';
+import ProtectedRoute from '../components/ProtectedRoute.tsx';
+import Login from '../pages/Login/Login.tsx';
 
 const router = createBrowserRouter([
   {
     element: <App />,
     children: [
+      { path: '/login', element: <Login /> },
       {
         path: '/',
-        element: <Home />,
+        element: (
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/artists',
-        element: <Artists />,
+        element: (
+          <ProtectedRoute>
+            <Artists />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/labels',
-        element: <Labels />,
+        element: (
+          <ProtectedRoute>
+            <Labels />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/artist/:id',
-        element: <ReleasesByArtist />,
+        element: (
+          <ProtectedRoute>
+            <ReleasesByArtist />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/label/:id',
-        element: <ReleasesByLabel />,
+        element: (
+          <ProtectedRoute>
+            <ReleasesByLabel />
+          </ProtectedRoute>
+        ),
       },
-      // 👉 ROUTE ADMIN PARENTE
       {
         path: '/admin',
-        element: <AdminDashboard />,
+        element: (
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        ),
         children: [
-          {
-            index: true,
-            element: <Navigate to="releases" />,
-          },
-          {
-            path: 'releases',
-            element: <ReleasesAdmin />,
-          },
-          {
-            path: 'artists',
-            element: <ArtistsAdmin />,
-          },
-          {
-            path: 'labels',
-            element: <LabelsAdmin />,
-          },
-          {
-            path: 'genres',
-            element: <GenresAdmin />,
-          },
-          {
-            path: 'styles',
-            element: <StylesAdmin />,
-          },
+          { index: true, element: <Navigate to="releases" /> },
+          { path: 'releases', element: <ReleasesAdmin /> },
+          { path: 'artists', element: <ArtistsAdmin /> },
+          { path: 'labels', element: <LabelsAdmin /> },
+          { path: 'genres', element: <GenresAdmin /> },
+          { path: 'styles', element: <StylesAdmin /> },
         ],
       },
-      {
-        path: '*',
-        element: <NotFound />,
-      },
+      { path: '*', element: <NotFound /> },
     ],
   },
 ]);
