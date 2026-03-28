@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import App from '../App';
 import Home from '../pages/Home/Home.tsx';
 import Artists from '../pages/Artists/Artists.tsx';
@@ -6,12 +6,12 @@ import Labels from '../pages/Labels/Labels.tsx';
 import NotFound from '../pages/NotFound/NotFound';
 import ReleasesByArtist from '../pages/ReleasesByArtist/ReleasesByArtist.tsx';
 import ReleasesByLabel from '../pages/ReleasesByLabel/ReleasesByLabel.tsx';
-import ReleasesAdmin from '../pages/Admin/ReleasesAdmin/RealeasesAdmin.tsx';
+import AdminDashboard from '../pages/Admin/AdminDashboard/AdminDashboard.tsx';
+import ReleasesAdmin from '../pages/Admin/ReleasesAdmin/ReleasesAdmin.tsx';
 import ArtistsAdmin from '../pages/Admin/ArtistsAdmin/ArtistsAdmin.tsx';
 import LabelsAdmin from '../pages/Admin/LabelsAdmin/LabelsAdmin.tsx';
 import GenresAdmin from '../pages/Admin/GenresAdmin/GenresAdmin.tsx';
 import StylesAdmin from '../pages/Admin/StylesAdmin/StylesAdmin.tsx';
-import CreateRelease from '../components/Admin/CreateRelease.tsx';
 
 const router = createBrowserRouter([
   {
@@ -37,29 +37,36 @@ const router = createBrowserRouter([
         path: '/label/:id',
         element: <ReleasesByLabel />,
       },
+      // 👉 ROUTE ADMIN PARENTE
       {
-        path: '/admin/releases',
-        element: <ReleasesAdmin />,
-      },
-      // {
-      //   path: '/admin/create_releases',
-      //   element: <CreateRelease />,
-      // },
-      {
-        path: '/admin/artists',
-        element: <ArtistsAdmin />,
-      },
-      {
-        path: '/admin/labels',
-        element: <LabelsAdmin />,
-      },
-      {
-        path: '/admin/genres',
-        element: <GenresAdmin />,
-      },
-      {
-        path: '/admin/styles',
-        element: <StylesAdmin />,
+        path: '/admin',
+        element: <AdminDashboard />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to="releases" />,
+          },
+          {
+            path: 'releases',
+            element: <ReleasesAdmin />,
+          },
+          {
+            path: 'artists',
+            element: <ArtistsAdmin />,
+          },
+          {
+            path: 'labels',
+            element: <LabelsAdmin />,
+          },
+          {
+            path: 'genres',
+            element: <GenresAdmin />,
+          },
+          {
+            path: 'styles',
+            element: <StylesAdmin />,
+          },
+        ],
       },
       {
         path: '*',

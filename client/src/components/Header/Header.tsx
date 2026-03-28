@@ -182,7 +182,7 @@ function Header() {
                 </ListItemButton>
                 <ListItemButton
                   component={NavLink}
-                  to="/admin/releases"
+                  to="/admin"
                   onClick={handleClose}
                   sx={(theme) => ({
                     '&.active': {
@@ -195,91 +195,7 @@ function Header() {
                   })}
                 >
                   <ListItemText
-                    primary="Admin_releases"
-                    primaryTypographyProps={{
-                      sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
-                    }}
-                  />
-                </ListItemButton>
-                <ListItemButton
-                  component={NavLink}
-                  to="/admin/artists"
-                  onClick={handleClose}
-                  sx={(theme) => ({
-                    '&.active': {
-                      backgroundColor: theme.palette.primary.main,
-                      color: 'white',
-                      '&:hover': {
-                        backgroundColor: theme.palette.primary.dark,
-                      },
-                    },
-                  })}
-                >
-                  <ListItemText
-                    primary="Admin_artists"
-                    primaryTypographyProps={{
-                      sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
-                    }}
-                  />
-                </ListItemButton>
-                <ListItemButton
-                  component={NavLink}
-                  to="/admin/labels"
-                  onClick={handleClose}
-                  sx={(theme) => ({
-                    '&.active': {
-                      backgroundColor: theme.palette.primary.main,
-                      color: 'white',
-                      '&:hover': {
-                        backgroundColor: theme.palette.primary.dark,
-                      },
-                    },
-                  })}
-                >
-                  <ListItemText
-                    primary="Admin_labels"
-                    primaryTypographyProps={{
-                      sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
-                    }}
-                  />
-                </ListItemButton>
-                <ListItemButton
-                  component={NavLink}
-                  to="/admin/genres"
-                  onClick={handleClose}
-                  sx={(theme) => ({
-                    '&.active': {
-                      backgroundColor: theme.palette.primary.main,
-                      color: 'white',
-                      '&:hover': {
-                        backgroundColor: theme.palette.primary.dark,
-                      },
-                    },
-                  })}
-                >
-                  <ListItemText
-                    primary="Admin_genres"
-                    primaryTypographyProps={{
-                      sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
-                    }}
-                  />
-                </ListItemButton>
-                <ListItemButton
-                  component={NavLink}
-                  to="/admin/styles"
-                  onClick={handleClose}
-                  sx={(theme) => ({
-                    '&.active': {
-                      backgroundColor: theme.palette.primary.main,
-                      color: 'white',
-                      '&:hover': {
-                        backgroundColor: theme.palette.primary.dark,
-                      },
-                    },
-                  })}
-                >
-                  <ListItemText
-                    primary="Admin_styles"
+                    primary="Admin"
                     primaryTypographyProps={{
                       sx: { fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 },
                     }}

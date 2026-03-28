@@ -10,14 +10,14 @@ function App() {
         style={{
           display: 'flex',
           flexDirection: 'column',
-          minHeight: '100vh', // prend toute la hauteur de l'écran
+          minHeight: '100vh',
         }}
       >
         <Header />
 
         <main
           style={{
-            flex: 1, // pousse le footer en bas si le contenu est court
+            flex: 1,
           }}
         >
           <Outlet />
