@@ -13,6 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { useFormat } from '../../context/FormatContext.js';
 import useIsMobile from '../../hooks/useIsMobile.js';
 import { useAuth } from '../../context/AuthContext.js';
@@ -57,7 +58,11 @@ function Header() {
           anchor="right"
           open={open}
           onClose={handleClose}
-          PaperProps={{ sx: { height: 'auto', minHeight: 100, mt: 8 } }}
+          slotProps={{
+            paper: {
+              sx: { height: 'auto', minHeight: 100, mt: 8 },
+            },
+          }}
         >
           <Box sx={{ width: 260 }} role="presentation">
             <List>
@@ -72,14 +77,19 @@ function Header() {
                         backgroundColor: selectedFormat === format ? 'primary.main' : 'transparent',
                         color: selectedFormat === format ? 'white' : 'inherit',
                         '&:hover': {
-                          backgroundColor: selectedFormat === format ? 'primary.dark' : 'action.hover',
+                          backgroundColor:
+                            selectedFormat === format ? 'primary.dark' : 'action.hover',
                         },
                       }}
                     >
                       <ListItemText
                         primary={
                           <Typography
-                            sx={{ fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 }}
+                            sx={{
+                              fontFamily: 'var(--font-01)',
+                              fontSize: '1.1rem',
+                              fontWeight: 500,
+                            }}
                           >
                             {format === 'LP' ? '33 Tours' : '45 Tours'}
                           </Typography>
@@ -89,9 +99,29 @@ function Header() {
                   ))}
 
                   {/* 🔴 Logout mobile */}
-                  <ListItemButton onClick={() => { logout(); setOpen(false); }} sx={{ mt: 2 }}>
+                  <ListItemButton
+                    onClick={() => {
+                      logout();
+                      setOpen(false);
+                    }}
+                    sx={{ mt: 2 }}
+                  >
                     <ListItemText
-                      primary={<Typography sx={{ fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500, color: 'red' }}>Logout</Typography>}
+                      primary={
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <LogoutIcon sx={{ fontSize: 20, color: 'var(--color-04)', }} />
+                          <Typography
+                            sx={{
+                              fontFamily: 'var(--font-01)',
+                              fontSize: '1.1rem',
+                              fontWeight: 500,
+                              color: 'var(--color-04)',
+                            }}
+                          >
+                            Logout
+                          </Typography>
+                        </Box>
+                      }
                     />
                   </ListItemButton>
                 </>
@@ -114,10 +144,20 @@ function Header() {
                     >
                       <ListItemText
                         primary={
-                          <Typography sx={{ fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500 }}>
-                            {path === '/' ? 'Releases' :
-                             path === '/artists' ? 'Artists' :
-                             path === '/labels' ? 'Labels' : 'Admin'}
+                          <Typography
+                            sx={{
+                              fontFamily: 'var(--font-01)',
+                              fontSize: '1.1rem',
+                              fontWeight: 500,
+                            }}
+                          >
+                            {path === '/'
+                              ? 'Releases'
+                              : path === '/artists'
+                                ? 'Artists'
+                                : path === '/labels'
+                                  ? 'Labels'
+                                  : 'Admin'}
                           </Typography>
                         }
                       />
@@ -127,7 +167,21 @@ function Header() {
                   {/* 🔴 Logout desktop */}
                   <ListItemButton onClick={logout} sx={{ mt: 1 }}>
                     <ListItemText
-                      primary={<Typography sx={{ fontFamily: 'var(--font-01)', fontSize: '1.1rem', fontWeight: 500, color: 'red' }}>Logout</Typography>}
+                      primary={
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <LogoutIcon sx={{ fontSize: 20, color: 'var(--color-04)', }} />
+                          <Typography
+                            sx={{
+                              fontFamily: 'var(--font-01)',
+                              fontSize: '1.1rem',
+                              fontWeight: 500,
+                              color: 'var(--color-04)',
+                            }}
+                          >
+                            Logout
+                          </Typography>
+                        </Box>
+                      }
                     />
                   </ListItemButton>
                 </>
