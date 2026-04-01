@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import { Button, TextField, Box, Typography, Paper } from '@mui/material';
 
 export default function Login() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -13,7 +15,7 @@ export default function Login() {
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>)  => {
     e.preventDefault();
     try {
-      const res = await fetch('http://localhost:3001/api/auth/login', {
+      const res = await fetch(`${backendUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
